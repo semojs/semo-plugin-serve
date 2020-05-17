@@ -20,7 +20,7 @@ export const handler = function(argv) {
     return
   }
 
-  const routeFilePath = path.resolve(routeDir, `${argv.name}.js`)
+  const routeFilePath = path.resolve(routeDir, `${argv.name}.${ argv.typescript ? 'ts' : 'js'}`)
   const routeFileDir = path.dirname(routeFilePath)
 
   Utils.fs.ensureDirSync(routeFileDir)
