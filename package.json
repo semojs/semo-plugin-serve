@@ -27,7 +27,8 @@
     "build": "tsc",
     "clean": "rimraf lib",
     "postversion": "git push && git push --tags",
-    "prepare": "npm run clean && npm run build"
+    "prepare": "npm run clean && npm run build",
+    "test": "exit 0"
   },
   "dependencies": {
     "@semo/core": "^0.0.39",
