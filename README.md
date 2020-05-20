@@ -173,7 +173,21 @@ module.exports = (app) => {
     await next()
   })
 }
+```
 
+## APIs
+
+如果不想用 Semo 来调度也可以直接已模块的方式引入，参数可以参考命令行选项
+
+```js
+import { startServer } from 'semo-plugin-serve'
+
+async() {
+  await startServer({
+    publicDir: '.'
+  })
+}
+```
 
 ## 开源协议
 
