@@ -8,7 +8,6 @@ import isRoot from 'is-root'
 import detect from 'detect-port';
 
 import Koa from 'koa'
-const app = new Koa()
 
 import errorMiddleware from '../middlewares/error'
 import staticMiddleware from '../middlewares/static'
@@ -19,13 +18,17 @@ import cors from 'kcors'
 import bodyParser from 'koa-bodyparser'
 import compress from 'koa-compress'
 
-export = async (argv) => {
+export = async (argv, app: any = null) => {
   argv.fileIndex = argv.fileIndex || 'index.html'
   argv.publicDir = argv.publicDir || '.'
   argv.apiPrefix = argv.apiPrefix || '/api'
 
   let port = parseInt(argv.port, 10) || 3000
   const appConfig = Utils.getApplicationConfig()
+
+  if (!app) {
+    app = new Koa()
+  }
 
   // 错误处理
   argv.disableInternalMiddlewareCustomError || app.use(errorMiddleware)
