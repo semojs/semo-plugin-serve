@@ -34,10 +34,10 @@ export const aliases = 's'
 export const desc = 'Simple server tool'
 
 export const builder = function (yargs) {
-  yargs.option('port', { default: false, describe: 'server port', alias: 'p' })
-  yargs.option('yes', { describe: 'say yes to use new port when default port in use', alias: 'y' })
-  yargs.option('list', { describe: 'list routes', alias: 'l' })
-  yargs.option('init-koa', { default: false, describe: 'initial koa application', alias: 'i' })
+  yargs.option('port', { default: false, describe: 'server port', alias: 'P' })
+  yargs.option('yes', { describe: 'say yes to use new port when default port in use', alias: 'Y' })
+  yargs.option('list', { describe: 'list routes', alias: 'L' })
+  yargs.option('init-koa', { default: false, describe: 'initial koa application', alias: 'I' })
   yargs.option('api-prefix', { default: '/api', describe: 'prefix all routes'})
   yargs.option('spa', { describe: 'fallback to index.html' })
   yargs.option('gzip', { describe: 'enable gzip' })
@@ -45,6 +45,7 @@ export const builder = function (yargs) {
   yargs.option('public-dir', { default: '.', describe: 'static files location' })
   yargs.option('file-index', { default: 'index.html', describe: 'index file name' })
   yargs.option('file-404', { default: false, describe: 'index file name' })
+  yargs.option('disable-index-directory', { default: false, describe: 'list directory files if file index not exist'})
   yargs.option('disable-internal-middleware-custom-error', { describe: 'disable internal middleware custom error'})
   yargs.option('disable-internal-middleware-custom-static', { describe: 'disable internal middleware custom static'})
   yargs.option('disable-internal-middleware-custom-router', { describe: 'disable internal middleware custom router'})

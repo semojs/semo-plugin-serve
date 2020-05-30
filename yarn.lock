@@ -287,6 +287,14 @@ accepts@^1.3.5:
     mime-types "~2.1.24"
     negotiator "0.6.2"
 
+accepts@~1.1.0:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/accepts/-/accepts-1.1.4.tgz#d71c96f7d41d0feda2c38cd14e8a27c04158df4a"
+  integrity sha1-1xyW99QdD+2iw4zRToonwEFY30o=
+  dependencies:
+    mime-types "~2.0.4"
+    negotiator "0.4.9"
+
 acorn-jsx@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.2.0.tgz#4c66069173d6fdd68ed85239fc256226182b2ebe"
@@ -385,6 +393,11 @@ balanced-match@^1.0.0:
   version "1.0.0"
   resolved "http://r.cnpmjs.org/balanced-match/download/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
+
+batch@0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/batch/-/batch-0.5.1.tgz#36a4bab594c050fd7b507bca0db30c2d92af4ff2"
+  integrity sha1-NqS6tZTAUP17UHvKDbMMLZKvT/I=
 
 binary-extensions@^2.0.0:
   version "2.0.0"
@@ -700,6 +713,13 @@ debug@^4.0.1, debug@^4.1.1:
   integrity sha512-pYAIzeRo8J6KPEaJ0VWOh5Pzkbw/RetuzehGM7QRRX5he4fPHx2rdKMB256ehJCkX+XRQm16eZLqLNS8RSZXZw==
   dependencies:
     ms "^2.1.1"
+
+debug@~2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-2.0.0.tgz#89bd9df6732b51256bc6705342bba02ed12131ef"
+  integrity sha1-ib2d9nMrUSVrxnBTQrugLtEhMe8=
+  dependencies:
+    ms "0.6.2"
 
 debug@~3.1.0:
   version "3.1.0"
@@ -1656,6 +1676,16 @@ koa-send@^5.0.0:
     mz "^2.7.0"
     resolve-path "^1.4.0"
 
+koa-serve-index@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/koa-serve-index/-/koa-serve-index-1.1.1.tgz#ccc6cee1e8150f3b27fa9640d918d1d36f815292"
+  integrity sha1-zMbO4egVDzsn+pZA2RjR02+BUpI=
+  dependencies:
+    accepts "~1.1.0"
+    batch "0.5.1"
+    debug "~2.0.0"
+    parseurl "~1.3.0"
+
 koa@^2.11.0:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/koa/-/koa-2.11.0.tgz#fe5a51c46f566d27632dd5dc8fd5d7dd44f935a4"
@@ -1760,12 +1790,24 @@ mime-db@1.44.0, "mime-db@>= 1.43.0 < 2":
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.44.0.tgz#fa11c5eb0aca1334b4233cb4d52f10c5a6272f92"
   integrity sha512-/NOTfLrsPBVeH7YtFPgsVWveuL+4SjjYxaQ1xtM1KMFj7HdxlBlxeyNLzhyJVx7r4rZGJAZ/6lkKCitSc/Nmpg==
 
+mime-db@~1.12.0:
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.12.0.tgz#3d0c63180f458eb10d325aaa37d7c58ae312e9d7"
+  integrity sha1-PQxjGA9FjrENMlqqN9fFiuMS6dc=
+
 mime-types@^2.1.18, mime-types@~2.1.24:
   version "2.1.27"
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.27.tgz#47949f98e279ea53119f5722e0f34e529bec009f"
   integrity sha512-JIhqnCasI9yD+SsmkquHBxTSEuZdQX5BuQnS2Vc7puQQQ+8yiP5AY5uWhpdv4YL4VM5c6iliiYWPgJ/nJQLp7w==
   dependencies:
     mime-db "1.44.0"
+
+mime-types@~2.0.4:
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.0.14.tgz#310e159db23e077f8bb22b748dabfa4957140aa6"
+  integrity sha1-MQ4VnbI+B3+Lsit0jav6SVcUCqY=
+  dependencies:
+    mime-db "~1.12.0"
 
 mimic-fn@^2.1.0:
   version "2.1.0"
@@ -1808,6 +1850,11 @@ mockjs@^1.1.0:
   dependencies:
     commander "*"
 
+ms@0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/ms/-/ms-0.6.2.tgz#d89c2124c6fdc1353d65a8b77bf1aac4b193708c"
+  integrity sha1-2JwhJMb9wTU9Zai3e/GqxLGTcIw=
+
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
@@ -1836,6 +1883,11 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
+
+negotiator@0.4.9:
+  version "0.4.9"
+  resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.4.9.tgz#92e46b6db53c7e421ed64a2bc94f08be7630df3f"
+  integrity sha1-kuRrbbU8fkIe1koryU8IvnYw3z8=
 
 negotiator@0.6.2:
   version "0.6.2"
@@ -1976,7 +2028,7 @@ parent-module@^1.0.0:
   dependencies:
     callsites "^3.0.0"
 
-parseurl@^1.3.2:
+parseurl@^1.3.2, parseurl@~1.3.0:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.3.tgz#9da19e7bee8d12dff0513ed5b76957793bc2e8d4"
   integrity sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==

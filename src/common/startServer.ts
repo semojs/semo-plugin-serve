@@ -18,6 +18,8 @@ import cors from 'kcors'
 import bodyParser from 'koa-bodyparser'
 import compress from 'koa-compress'
 
+import serveIndex from 'koa-serve-index'
+
 export = async (argv, app: any = null) => {
   argv.fileIndex = argv.fileIndex || 'index.html'
   argv.publicDir = argv.publicDir || '.'
@@ -59,18 +61,23 @@ export = async (argv, app: any = null) => {
       Utils.error('Invalid public dir.')
     }
 
-    if (argv.spa && argv.fileIndex && !fs.existsSync(path.resolve(argv.publicDir, argv.fileIndex))) {
-      Utils.error('Invalid file index')
+    if (argv.fileIndex && !fs.existsSync(path.resolve(argv.publicDir, argv.fileIndex))) {
+      if (argv.spa) {
+        Utils.error('Invalid file index')
+      } else if (!argv.disableIndexDirectory) {
+        app.use(serveIndex(argv.publicDir))
+      }
+    } else {
+      app.use(staticMiddleware(argv))
     }
 
     if (argv.file404 && !fs.existsSync(path.resolve(argv.publicDir, argv.file404))) {
       Utils.error('Invalid file 404')
     }
-
-    app.use(staticMiddleware(argv))
   }
 
   // 加载动态路由
+  // 如果fileIndex不存在，这里的路由有可能会跟serveIndex的机制冲突，所以如果明确只讲本功能用于开发api服务，应该禁用index directory
   argv.disableInternalMiddlewareCustomRouter || app.use(routerMiddleware(argv))
 
 
