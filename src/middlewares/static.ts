@@ -13,7 +13,6 @@ export = argv => {
     }
 
     if (ctx.body != null || ctx.status !== 404) return
-
     try {
       // 尝试发送请求的静态资源
       await send(ctx, ctx.path, opts)

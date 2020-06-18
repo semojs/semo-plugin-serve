@@ -17,13 +17,21 @@ import logger from 'koa-logger'
 import cors from 'kcors'
 import bodyParser from 'koa-bodyparser'
 import compress from 'koa-compress'
-
+import views from 'koa-views'
 import serveIndex from 'koa-serve-index'
 
 export = async (argv, app: any = null) => {
-  argv.fileIndex = argv.fileIndex || 'index.html'
   argv.publicDir = argv.publicDir || '.'
-  argv.apiPrefix = argv.apiPrefix || '/api'
+  argv.apiPrefix = argv.apiPrefix || ''
+
+  argv.disableIndexDirectory = Utils._.get(argv, 'semo-plugin-serve.disableIndexDirectory', argv.disableIndexDirectory)
+  argv.disableGlobalExcpetionRouter = Utils._.get(argv, 'semo-plugin-serve.disableGlobalExcpetionRouter', argv.disableGlobalExcpetionRouter)
+  argv.disableInternalMiddlewareKoaLogger = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareKoaLogger', argv.disableInternalMiddlewareKoaLogger)
+  argv.disableInternalMiddlewareCustomError = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareCustomError', argv.disableInternalMiddlewareCustomError)
+  argv.disableInternalMiddlewareKoaLogger = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareKoaLogger', argv.disableInternalMiddlewareKoaLogger)
+  argv.disableInternalMiddlewareKcors = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareKcors', argv.disableInternalMiddlewareKcors)
+  argv.disableInternalMiddlewareKoaBodyparser = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareKoaBodyparser', argv.disableInternalMiddlewareKoaBodyparser)
+  argv.disableInternalMiddlewareCustomRouter = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareCustomRouter', argv.disableInternalMiddlewareCustomRouter)
 
   let port = parseInt(argv.port, 10) || 3000
   const appConfig = Utils.getApplicationConfig()
@@ -49,11 +57,25 @@ export = async (argv, app: any = null) => {
   if (argv.gzip) {
     app.use(compress({
       filter: function (content_type) {
-        return /text/i.test(content_type)
+        return /text|javascript|css/i.test(content_type)
       },
       threshold: 2048
     }))
   }
+
+  if (argv.viewsDir) {
+    app.use(views(path.resolve(argv.viewsDir), {
+      autoRender: false,
+      map: {
+        html: argv.viewsEngine || 'nunjucks',
+        extension: argv.viewsExtension || 'html'
+      }
+    }))
+  }
+
+  // 加载动态路由
+  // 如果fileIndex不存在，这里的路由有可能会跟serveIndex的机制冲突，所以如果明确只讲本功能用于开发api服务，应该禁用index directory
+  argv.disableInternalMiddlewareCustomRouter || app.use(routerMiddleware(argv))
 
   // 加载静态资源
   if (!argv.disableInternalMiddlewareCustomStatic) {
@@ -75,11 +97,6 @@ export = async (argv, app: any = null) => {
       Utils.error('Invalid file 404')
     }
   }
-
-  // 加载动态路由
-  // 如果fileIndex不存在，这里的路由有可能会跟serveIndex的机制冲突，所以如果明确只讲本功能用于开发api服务，应该禁用index directory
-  argv.disableInternalMiddlewareCustomRouter || app.use(routerMiddleware(argv))
-
 
   // 给启动信息加个框
   const box = [Utils.chalk.green('Semo Serving!'), '']

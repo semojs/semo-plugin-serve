@@ -1,5 +1,6 @@
 import { Utils } from '@semo/core'
 import path from 'path'
+import axios from 'axios'
 
 import requireDirectory from 'require-directory'
 import { validate } from 'indicative/validator'
@@ -35,7 +36,6 @@ const travelRouter = (argv, router, routes, prefixPath = '') => {
         middlewares.push(async (ctx) => {
           // 内置路由实例
           ctx.router = router
-
           // 支持数据模拟实例，基于 mockjs
           ctx.Mock = Mock
           ctx.mock = Mock.mock
@@ -62,7 +62,7 @@ const travelRouter = (argv, router, routes, prefixPath = '') => {
             ctx.gzip = true
           }
 
-          const handled = await route.handler(ctx)
+          const handled = await route.handler(ctx, argv)
 
           if (argv.gzip) {
             ctx.compress = ctx.gzip
@@ -99,24 +99,42 @@ export = (argv) => {
     router.prefix(argv.apiPrefix)
   }
 
+  if (argv.proxy) {
+    router.get('/proxy/(.*)', async (ctx, next) => {
+      const proxyUrl = ctx.request.url.substring(7)
+      return axios({
+        url: proxyUrl,
+        responseType: 'stream'
+      }).then(response => {
+        ctx.type = response.headers['content-type']
+        ctx.body = response.data
+      })
+    })
+  }
+
   const routes = argv.routeDir ? requireDirectory(module, path.resolve(appConfig.applicationDir, argv.routeDir)) : null
   if (routes) {
     travelRouter(argv, router, routes)
 
-    // 默认路由，如果没有设置路由目录，则默认路由也没有
-    router['all']('*', async ctx => {
-      // @ts-ignore
-      throw new ctx.Exception(4)
-    })
+    if (!argv.disableGlobalExcpetionRouter) {
+      // 默认路由，如果没有设置路由目录，则默认路由也没有
+      router['all']('/(.*)', async ctx => {
+        // @ts-ignore
+        throw new ctx.Exception(4)
+      })
+    }
   }
+
 
   // 查看注册的所有路由
   if (argv.list) {
-    const publicDir = argv.publicDir ? path.resolve(argv.publicDir) : path.resolve('.')
-    console.log(`${Utils.chalk.green('Static Directory:')}`)
-    console.log(publicDir)
+    if (!argv.disableInternalMiddlewareCustomStatic) {
+      const publicDir = argv.publicDir ? path.resolve(argv.publicDir) : path.resolve('.')
+      console.log(`${Utils.chalk.green('Static Directory:')}`)
+      console.log(publicDir)
+      console.log()
+    }
 
-    console.log()
     console.log(Utils.chalk.green('Routes:'))
     const headers = [Utils.chalk.cyan.bold('PATH'), Utils.chalk.cyan.bold('NAME'), Utils.chalk.cyan.bold('METHOD')]
     const rows: any = []
@@ -128,7 +146,7 @@ export = (argv) => {
       ])
     })
 
-    console.log(rows.length > 0 ? Utils.table([headers].concat(rows)) : Utils.chalk.yellow('No routes exist.'))
+    console.log(rows.length > 0 ? Utils.table([headers].concat(rows)) : Utils.chalk.yellow('No routes defined.'))
     process.exit(0)
   }
 
