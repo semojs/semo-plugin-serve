@@ -1,4 +1,3 @@
-import { Utils } from '@semo/core'
 import path from 'path'
 import fs from 'fs'
 import os from 'os'
@@ -21,16 +20,17 @@ import views from 'koa-views'
 import serveIndex from 'koa-serve-index'
 
 export = async (argv, app: any = null) => {
+  const { Utils } = argv.$semo
   argv.publicDir = argv.publicDir || '.'
   argv.apiPrefix = argv.apiPrefix || ''
 
-  argv.disableIndexDirectory = !Utils._.isNull(argv.disableIndexDirectory) ? argv.disableIndexDirectory : argv.$config.disableIndexDirectory
-  argv.disableGlobalExcpetionRouter = !Utils._.isNull(argv.disableGlobalExcpetionRouter) ? argv.disableGlobalExcpetionRouter : argv.$config.disableGlobalExcpetionRouter
-  argv.disableInternalMiddlewareCustomError = !Utils._.isNull(argv.disableInternalMiddlewareCustomError) ? argv.disableInternalMiddlewareCustomError : argv.$config.disableInternalMiddlewareCustomError
-  argv.disableInternalMiddlewareKoaLogger = !Utils._.isNull(argv.disableInternalMiddlewareKoaLogger) ? argv.disableInternalMiddlewareKoaLogger : argv.$config.disableInternalMiddlewareKoaLogger
-  argv.disableInternalMiddlewareKcors = !Utils._.isNull(argv.disableInternalMiddlewareKcors) ? argv.disableInternalMiddlewareKcors : argv.$config.disableInternalMiddlewareKcors
-  argv.disableInternalMiddlewareKoaBodyparser = !Utils._.isNull(argv.disableInternalMiddlewareKoaBodyparser) ? argv.disableInternalMiddlewareKoaBodyparser : argv.$config.disableInternalMiddlewareKoaBodyparser
-  argv.disableInternalMiddlewareCustomRouter = !Utils._.isNull(argv.disableInternalMiddlewareCustomRouter) ? argv.disableInternalMiddlewareCustomRouter : argv.$config.disableInternalMiddlewareCustomRouter
+  argv.disableIndexDirectory = Utils.config('disableIndexDirectory', argv.disableIndexDirectory)
+  argv.disableGlobalExcpetionRouter = Utils.config('disableGlobalExcpetionRouter', argv.disableGlobalExcpetionRouter)
+  argv.disableInternalMiddlewareCustomError = Utils.config('disableInternalMiddlewareCustomError', argv.disableInternalMiddlewareCustomError)
+  argv.disableInternalMiddlewareKoaLogger = Utils.config('disableInternalMiddlewareKoaLogger', argv.disableInternalMiddlewareKoaLogger)
+  argv.disableInternalMiddlewareKcors = Utils.config('disableInternalMiddlewareKcors', argv.disableInternalMiddlewareKcors)
+  argv.disableInternalMiddlewareKoaBodyparser = Utils.config('disableInternalMiddlewareKoaBodyparser', argv.disableInternalMiddlewareKoaBodyparser)
+  argv.disableInternalMiddlewareCustomRouter = Utils.config('disableInternalMiddlewareCustomRouter', argv.disableInternalMiddlewareCustomRouter)
 
   let port = parseInt(argv.port, 10) || 3000
   const appConfig = Utils.getApplicationConfig()
@@ -73,7 +73,7 @@ export = async (argv, app: any = null) => {
   }
 
   // 加载动态路由
-  // 如果fileIndex不存在，这里的路由有可能会跟serveIndex的机制冲突，所以如果明确只讲本功能用于开发api服务，应该禁用index directory
+  // 如果fileIndex不存在，这里的路由有可能会跟serveIndex的机制冲突，所以如果明确只将本功能用于开发api服务，应该禁用index directory
   argv.disableInternalMiddlewareCustomRouter || app.use(routerMiddleware(argv))
 
   // 加载静态资源
@@ -130,26 +130,28 @@ export = async (argv, app: any = null) => {
   }
 
   // HOST地址检测
-  const localhost = 'http://localhost'
+  const localhost = `http://localhost:${_port}`
   const network = Utils._.chain(os.networkInterfaces()).flatMap().find(o => o.family === 'IPv4' && o.internal === false).value()
-  const nethost = network ? `http://${network.address}` : null
+  const nethost = network ? `http://${network.address}:${_port}` : null
 
   app.listen(port)
   if (argv.openBrowser) {
-    await open(argv.nethost || argv.localhost)
+    await open(nethost || localhost)
   }
 
   // 清除终端，copy from package: react-dev-utils
-  function clearConsole() {
-    process.stdout.write(
-      process.platform === 'win32' ? '\x1B[2J\x1B[0f' : '\x1B[2J\x1B[3J\x1B[H'
-    );
+  if (argv.clearConsole) {
+    function clearConsole() {
+      process.stdout.write(
+        process.platform === 'win32' ? '\x1B[2J\x1B[0f' : '\x1B[2J\x1B[3J\x1B[H'
+      );
+    }
+    process.stdout.isTTY && clearConsole()
   }
-  process.stdout.isTTY && clearConsole()
 
-  box.push(Utils.chalk.bold(`Local: `) + Utils.chalk.green(`${localhost}:${_port}`))
+  box.push(Utils.chalk.bold(`Local: `) + Utils.chalk.green(localhost))
   if (nethost) {
-    box.push(Utils.chalk.bold(`Network: `) + Utils.chalk.green(`${nethost}:${_port}`))
+    box.push(Utils.chalk.bold(`Network: `) + Utils.chalk.green(nethost))
   }
   box.push(Utils.chalk.bold('- spa: ') + (argv.spa ? Utils.chalk.green('on'): Utils.chalk.red('off')))
   box.push(Utils.chalk.bold('- gzip: ') + (argv.gzip ? Utils.chalk.green('on'): Utils.chalk.red('off')))
