@@ -4,7 +4,7 @@ import fs from 'fs'
 import os from 'os'
 import boxen from 'boxen'
 import isRoot from 'is-root'
-
+import open from 'open'
 import detect from 'detect-port';
 
 import Koa from 'koa'
@@ -24,14 +24,13 @@ export = async (argv, app: any = null) => {
   argv.publicDir = argv.publicDir || '.'
   argv.apiPrefix = argv.apiPrefix || ''
 
-  argv.disableIndexDirectory = Utils._.get(argv, 'semo-plugin-serve.disableIndexDirectory', argv.disableIndexDirectory)
-  argv.disableGlobalExcpetionRouter = Utils._.get(argv, 'semo-plugin-serve.disableGlobalExcpetionRouter', argv.disableGlobalExcpetionRouter)
-  argv.disableInternalMiddlewareKoaLogger = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareKoaLogger', argv.disableInternalMiddlewareKoaLogger)
-  argv.disableInternalMiddlewareCustomError = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareCustomError', argv.disableInternalMiddlewareCustomError)
-  argv.disableInternalMiddlewareKoaLogger = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareKoaLogger', argv.disableInternalMiddlewareKoaLogger)
-  argv.disableInternalMiddlewareKcors = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareKcors', argv.disableInternalMiddlewareKcors)
-  argv.disableInternalMiddlewareKoaBodyparser = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareKoaBodyparser', argv.disableInternalMiddlewareKoaBodyparser)
-  argv.disableInternalMiddlewareCustomRouter = Utils._.get(argv, 'semo-plugin-serve.disableInternalMiddlewareCustomRouter', argv.disableInternalMiddlewareCustomRouter)
+  argv.disableIndexDirectory = !Utils._.isNull(argv.disableIndexDirectory) ? argv.disableIndexDirectory : argv.$config.disableIndexDirectory
+  argv.disableGlobalExcpetionRouter = !Utils._.isNull(argv.disableGlobalExcpetionRouter) ? argv.disableGlobalExcpetionRouter : argv.$config.disableGlobalExcpetionRouter
+  argv.disableInternalMiddlewareCustomError = !Utils._.isNull(argv.disableInternalMiddlewareCustomError) ? argv.disableInternalMiddlewareCustomError : argv.$config.disableInternalMiddlewareCustomError
+  argv.disableInternalMiddlewareKoaLogger = !Utils._.isNull(argv.disableInternalMiddlewareKoaLogger) ? argv.disableInternalMiddlewareKoaLogger : argv.$config.disableInternalMiddlewareKoaLogger
+  argv.disableInternalMiddlewareKcors = !Utils._.isNull(argv.disableInternalMiddlewareKcors) ? argv.disableInternalMiddlewareKcors : argv.$config.disableInternalMiddlewareKcors
+  argv.disableInternalMiddlewareKoaBodyparser = !Utils._.isNull(argv.disableInternalMiddlewareKoaBodyparser) ? argv.disableInternalMiddlewareKoaBodyparser : argv.$config.disableInternalMiddlewareKoaBodyparser
+  argv.disableInternalMiddlewareCustomRouter = !Utils._.isNull(argv.disableInternalMiddlewareCustomRouter) ? argv.disableInternalMiddlewareCustomRouter : argv.$config.disableInternalMiddlewareCustomRouter
 
   let port = parseInt(argv.port, 10) || 3000
   const appConfig = Utils.getApplicationConfig()
@@ -136,6 +135,9 @@ export = async (argv, app: any = null) => {
   const nethost = network ? `http://${network.address}` : null
 
   app.listen(port)
+  if (argv.openBrowser) {
+    await open(argv.nethost || argv.localhost)
+  }
 
   // 清除终端，copy from package: react-dev-utils
   function clearConsole() {

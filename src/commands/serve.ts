@@ -50,13 +50,14 @@ export const builder = function (yargs) {
   yargs.option('views-extension', { default: 'html', describe: 'set koa-views template extension' })
   yargs.option('views-dir', { default: '', describe: 'set koa-views template dir'})
   yargs.option('views-data', { default: '', describe: 'set koa-views template data'})
-  // yargs.option('disable-index-directory', { default: false, describe: 'list directory files if file index not exist'})
-  // yargs.option('disable-internal-middleware-custom-error', { describe: 'disable internal middleware custom error'})
-  // yargs.option('disable-internal-middleware-custom-static', { describe: 'disable internal middleware custom static'})
-  // yargs.option('disable-internal-middleware-custom-router', { describe: 'disable internal middleware custom router'})
-  // yargs.option('disable-internal-middleware-koa-logger', { describe: 'disable internal middleware koa-logger'})
-  // yargs.option('disable-internal-middleware-koa-bodyparser', { describe: 'disable internal middleware koa-bodyparser'})
-  // yargs.option('disable-internal-middleware-koa-kcors', { describe: 'disable internal middleware kcors'})
+  yargs.option('open-browser', { describe: 'Auto open browser in web format.', alias: ['open', 'B'] })
+  yargs.option('disable-index-directory', { default: false, describe: 'list directory files if file index not exist'})
+  yargs.option('disable-internal-middleware-custom-error', { describe: 'disable internal middleware custom error'})
+  yargs.option('disable-internal-middleware-custom-static', { describe: 'disable internal middleware custom static'})
+  yargs.option('disable-internal-middleware-custom-router', { describe: 'disable internal middleware custom router'})
+  yargs.option('disable-internal-middleware-koa-logger', { describe: 'disable internal middleware koa-logger'})
+  yargs.option('disable-internal-middleware-koa-bodyparser', { describe: 'disable internal middleware koa-bodyparser'})
+  yargs.option('disable-internal-middleware-koa-kcors', { describe: 'disable internal middleware kcors'})
 }
 
 export const handler = async function (argv) {
