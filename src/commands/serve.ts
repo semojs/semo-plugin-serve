@@ -64,5 +64,15 @@ export const builder = function (yargs) {
 }
 
 export const handler = async function (argv) {
+  const { Utils } = argv.$semo
+  
+  argv.disableIndexDirectory = Utils.config('disableIndexDirectory', argv.disableIndexDirectory)
+  argv.disableGlobalExcpetionRouter = Utils.config('disableGlobalExcpetionRouter', argv.disableGlobalExcpetionRouter)
+  argv.disableInternalMiddlewareCustomError = Utils.config('disableInternalMiddlewareCustomError', argv.disableInternalMiddlewareCustomError)
+  argv.disableInternalMiddlewareKoaLogger = Utils.config('disableInternalMiddlewareKoaLogger', argv.disableInternalMiddlewareKoaLogger)
+  argv.disableInternalMiddlewareKcors = Utils.config('disableInternalMiddlewareKcors', argv.disableInternalMiddlewareKcors)
+  argv.disableInternalMiddlewareKoaBodyparser = Utils.config('disableInternalMiddlewareKoaBodyparser', argv.disableInternalMiddlewareKoaBodyparser)
+  argv.disableInternalMiddlewareCustomRouter = Utils.config('disableInternalMiddlewareCustomRouter', argv.disableInternalMiddlewareCustomRouter)
+
   await startServer(argv)
 }

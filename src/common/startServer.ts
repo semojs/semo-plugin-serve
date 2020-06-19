@@ -1,3 +1,5 @@
+import { Utils } from '@semo/core'
+
 import path from 'path'
 import fs from 'fs'
 import os from 'os'
@@ -20,17 +22,8 @@ import views from 'koa-views'
 import serveIndex from 'koa-serve-index'
 
 export = async (argv, app: any = null) => {
-  const { Utils } = argv.$semo
   argv.publicDir = argv.publicDir || '.'
   argv.apiPrefix = argv.apiPrefix || ''
-
-  argv.disableIndexDirectory = Utils.config('disableIndexDirectory', argv.disableIndexDirectory)
-  argv.disableGlobalExcpetionRouter = Utils.config('disableGlobalExcpetionRouter', argv.disableGlobalExcpetionRouter)
-  argv.disableInternalMiddlewareCustomError = Utils.config('disableInternalMiddlewareCustomError', argv.disableInternalMiddlewareCustomError)
-  argv.disableInternalMiddlewareKoaLogger = Utils.config('disableInternalMiddlewareKoaLogger', argv.disableInternalMiddlewareKoaLogger)
-  argv.disableInternalMiddlewareKcors = Utils.config('disableInternalMiddlewareKcors', argv.disableInternalMiddlewareKcors)
-  argv.disableInternalMiddlewareKoaBodyparser = Utils.config('disableInternalMiddlewareKoaBodyparser', argv.disableInternalMiddlewareKoaBodyparser)
-  argv.disableInternalMiddlewareCustomRouter = Utils.config('disableInternalMiddlewareCustomRouter', argv.disableInternalMiddlewareCustomRouter)
 
   let port = parseInt(argv.port, 10) || 3000
   const appConfig = Utils.getApplicationConfig()
