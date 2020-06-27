@@ -112,6 +112,13 @@ export = (argv) => {
     })
   }
 
+  if (argv.healthCheck) {
+    router.get('/healthCheck', async (ctx, next) => {
+      ctx.body = 'OK'
+    })
+  }
+
+
   const routes = argv.routeDir ? requireDirectory(module, path.resolve(appConfig.applicationDir, argv.routeDir)) : null
   if (routes) {
     travelRouter(argv, router, routes)
