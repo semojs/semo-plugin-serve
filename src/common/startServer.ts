@@ -10,9 +10,9 @@ import detect from 'detect-port';
 
 import Koa from 'koa'
 
-import errorMiddleware from '../middlewares/error'
+import { errorMiddleware } from '../middlewares/error'
 import staticMiddleware from '../middlewares/static'
-import routerMiddleware from '../middlewares/router'
+import { routerMiddleware } from '../middlewares/router'
 
 import logger from 'koa-logger'
 import cors from 'kcors'

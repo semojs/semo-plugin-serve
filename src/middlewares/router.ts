@@ -5,9 +5,16 @@ import axios from 'axios'
 import requireDirectory from 'require-directory'
 import { validate } from 'indicative/validator'
 import Router from 'koa-router'
+import { Context } from 'koa'
+import { Exception } from './error'
+import Mock from 'mockjs'
+
 const router = new Router()
 
-import Mock from 'mockjs'
+export type SemoServeContext = Context & {
+  Mock: Mock.Mockjs,
+  Exception: Exception
+}
 
 const travelRouter = (argv, router, routes, prefixPath = '') => {
   Object.keys(routes).forEach(name => {
@@ -33,7 +40,7 @@ const travelRouter = (argv, router, routes, prefixPath = '') => {
       // 路由中间件
       let middlewares = route.middleware ? Utils._.castArray(route.middleware) : []
       if (route.handler) {
-        middlewares.push(async (ctx) => {
+        middlewares.push(async (ctx: Context) => {
           // 内置路由实例
           ctx.router = router
           // 支持数据模拟实例，基于 mockjs
@@ -91,7 +98,7 @@ const travelRouter = (argv, router, routes, prefixPath = '') => {
   })
 }
 
-export = (argv) => {
+export const routerMiddleware = (argv) => {
   const appConfig = Utils.getApplicationConfig()
 
   // 支持路由前缀
@@ -127,7 +134,7 @@ export = (argv) => {
       // 默认路由，如果没有设置路由目录，则默认路由也没有
       router['all']('/(.*)', async ctx => {
         // @ts-ignore
-        throw new ctx.Exception(4)
+        throw new ctx.Exception(4, `Undefined route ${ctx.path}`)
       })
     }
   }

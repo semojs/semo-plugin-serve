@@ -59,4 +59,6 @@ export const handler = async function (argv) {
   argv.disableInternalMiddlewareCustomRouter = Utils.pluginConfig('disableInternalMiddlewareCustomRouter')
 
   await startServer(argv)
+
+  return false
 }

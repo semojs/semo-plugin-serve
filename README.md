@@ -189,6 +189,10 @@ async() {
 }
 ```
 
+## Constants
+
+* SEMO_SERVE_DISABLE_ERROR_STACK=1
+
 ## 开源协议
 
 MIT

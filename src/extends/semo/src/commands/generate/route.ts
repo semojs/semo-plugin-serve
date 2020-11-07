@@ -11,6 +11,11 @@ export const builder = function (yargs) {
     alias: 'ts',
     describe: 'generate typescript style code'
   })
+
+  yargs.option('force', {
+    alias: 'F',
+    describe: 'Force create, override existed file.'
+  })
 }
 
 export const handler = function(argv) {
@@ -24,7 +29,7 @@ export const handler = function(argv) {
   const routeFileDir = path.dirname(routeFilePath)
 
   Utils.fs.ensureDirSync(routeFileDir)
-  if (fs.existsSync(routeFilePath)) {
+  if (!argv.force && fs.existsSync(routeFilePath)) {
     Utils.error(Utils.chalk.red('Route file exist!'))
   }
 
@@ -46,22 +51,22 @@ export const handler = async ctx => {
 `
   } else {
     code = `// exports.name = '' // 路由名字，非必填
-    // exports.path = '' // 追加额外的路由，非必填
-    // exports.method = 'get' // 路由方法，默认 get，非必填
-    // // https://indicative.adonisjs.com/validations/master/min
-    // exports.middleware = [] // 为单个路由指定前置中间件
-    // exports.validate = {
-    //   username: 'min:6' 
-    // }
-    exports.handler = async ctx => {
-      // ctx.errors[11] = '错误'
-      ctx.json = true // 返回JSON数据结构
-      return 'hello'
-    }
+// exports.path = '' // 追加额外的路由，非必填
+// exports.method = 'get' // 路由方法，默认 get，非必填
+// // https://indicative.adonisjs.com/validations/master/min
+// exports.middleware = [] // 为单个路由指定前置中间件
+// exports.validate = {
+//   username: 'min:6' 
+// }
+exports.handler = async ctx => {
+  // ctx.errors[11] = '错误'
+  ctx.json = true // 返回JSON数据结构
+  return 'hello'
+}
     `
   }
 
-  if (!fs.existsSync(routeFilePath)) {
+  if (argv.force || !fs.existsSync(routeFilePath)) {
     fs.writeFileSync(routeFilePath, code)
     console.log(Utils.chalk.green(`${routeFilePath} created!`))
   }
