@@ -32,7 +32,7 @@
     "test": "exit 0"
   },
   "dependencies": {
-    "@semo/core": "^1.5.1",
+    "@semo/core": "^1.5.3",
     "@types/mockjs": "^1.0.3",
     "axios": "^0.21.0",
     "boxen": "^4.2.0",
