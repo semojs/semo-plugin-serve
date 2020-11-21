@@ -125,6 +125,9 @@ export const routerMiddleware = (argv) => {
     })
   }
 
+  if (argv.addRoutes && typeof argv.addRoutes === 'function') {
+    argv.addRoutes(router)
+  }
 
   const routes = argv.routeDir ? requireDirectory(module, path.resolve(appConfig.applicationDir, argv.routeDir)) : null
   if (routes) {
