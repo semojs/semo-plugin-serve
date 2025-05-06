@@ -241,6 +241,80 @@
     </div>
 
     <script>
+      // IndexedDB工具函数
+      const DB_NAME = 'ai_chat_db'
+      const DB_VERSION = 1
+      const CHAT_STORE = 'chatDetails'
+
+      function openDB() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(DB_NAME, DB_VERSION)
+          request.onupgradeneeded = function (event) {
+            const db = event.target.result
+            if (!db.objectStoreNames.contains(CHAT_STORE)) {
+              db.createObjectStore(CHAT_STORE, { keyPath: 'chatId' })
+            }
+          }
+          request.onsuccess = function (event) {
+            resolve(event.target.result)
+          }
+          request.onerror = function (event) {
+            reject(event.target.error)
+          }
+        })
+      }
+
+      function saveChatDetail(chatId, messages) {
+        // 只保存可序列化字段
+        const serializableMessages = messages.map((msg) => {
+          const { content, isAI, chatId } = msg
+          return { content, isAI, chatId }
+        })
+        return openDB().then((db) => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction([CHAT_STORE], 'readwrite')
+            const store = tx.objectStore(CHAT_STORE)
+            store.put({ chatId, messages: serializableMessages })
+            tx.oncomplete = resolve
+            tx.onerror = reject
+          })
+        })
+      }
+
+      function getChatDetail(chatId) {
+        return openDB().then((db) => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction([CHAT_STORE], 'readonly')
+            const store = tx.objectStore(CHAT_STORE)
+            const req = store.get(chatId)
+            req.onsuccess = () => resolve(req.result ? req.result.messages : [])
+            req.onerror = reject
+          })
+        })
+      }
+
+      function getAllChatDetails() {
+        return openDB().then((db) => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction([CHAT_STORE], 'readonly')
+            const store = tx.objectStore(CHAT_STORE)
+            const req = store.getAll()
+            req.onsuccess = () => resolve(req.result)
+            req.onerror = reject
+          })
+        })
+      }
+
+      // 会话列表存储到localStorage
+      function saveChatListToLocalStorage(chatListArr) {
+        localStorage.setItem('chatList', JSON.stringify(chatListArr))
+      }
+
+      function getChatListFromLocalStorage() {
+        const data = localStorage.getItem('chatList')
+        return data ? JSON.parse(data) : []
+      }
+
       // 从localStorage加载设置
       const ollamaUrlInput = document.getElementById('ollamaUrl')
       const modelNameInput = document.getElementById('modelName')
@@ -309,26 +383,66 @@
 
       // 全局聊天数据存储
       const chatData = new Map()
-      // 存储每个会话的响应控制器
       const responseControllers = new Map()
       let currentChatId = null
       const chatList = document.getElementById('chatList')
       const chatMessages = document.getElementById('chatMessages')
       const messageInput = document.getElementById('messageInput')
 
-      // 创建新会话
-      document.getElementById('newChat').addEventListener('click', () => {
-        const chatId = uuidv4()
-        createChatItem(chatId)
-        switchChat(chatId)
+      let chatListArr = getChatListFromLocalStorage()
+
+      // 恢复会话列表和详情
+      document.addEventListener('DOMContentLoaded', async () => {
+        // 按时间倒序排序
+        chatListArr.sort((a, b) => a.createdAt - b.createdAt)
+        // 恢复会话列表
+        chatListArr.forEach((chatObj) => {
+          createChatItem(chatObj.id, chatObj.name, chatObj.rolePrompt)
+        })
+        // 恢复会话详情
+        for (const chatObj of chatListArr) {
+          const messages = await getChatDetail(chatObj.id)
+          if (messages && messages.length) {
+            chatData.set(chatObj.id, messages)
+          }
+        }
+        // 自动切换到第一个会话
+        if (chatListArr.length > 0) {
+          switchChat(chatListArr[0].id)
+        }
       })
 
+      // 创建新会话
+      function createNewChat() {
+        const chatId = uuidv4()
+        const chatObj = {
+          id: chatId,
+          name: `会话 ${chatListArr.length + 1}`,
+          rolePrompt: '', // 预留角色提示词
+          createdAt: Date.now(),
+        }
+        chatListArr.unshift(chatObj)
+        // 按时间倒序排序
+        chatListArr.sort((a, b) => a.createdAt - b.createdAt)
+        saveChatListToLocalStorage(chatListArr)
+        // 重新渲染会话列表
+        chatList.innerHTML = ''
+        chatListArr.forEach((chatObj) => {
+          createChatItem(chatObj.id, chatObj.name, chatObj.rolePrompt)
+        })
+        switchChat(chatId)
+      }
+
+      document
+        .getElementById('newChat')
+        .addEventListener('click', createNewChat)
+
       // 创建会话项
-      function createChatItem(chatId) {
+      function createChatItem(chatId, name, rolePrompt) {
         const chatItem = document.createElement('div')
         chatItem.className =
           'p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors'
-        chatItem.textContent = `会话 ${chatList.children.length + 1}`
+        chatItem.textContent = name || `会话 ${chatList.children.length + 1}`
         chatItem.dataset.chatId = chatId
         chatItem.onclick = () => switchChat(chatId)
         chatList.insertBefore(chatItem, chatList.firstChild)
@@ -377,14 +491,49 @@
 
         const messageBubble = document.createElement('div')
         messageBubble.className = `rounded-lg px-4 py-2 ${isAI ? 'bg-white border border-gray-200 prose' : 'bg-gray-900 text-white prose prose-invert'}`
-        messageBubble.innerHTML = marked.parse(content)
+
+        // 优化：解析<think></think>标签，思考部分放details，正文部分用marked解析
+        if (isAI && content.includes('<think>')) {
+          const thinkStart = content.indexOf('<think>')
+          const thinkEnd = content.indexOf('</think>')
+          let mainContent = content
+          if (thinkStart !== -1 && thinkEnd !== -1) {
+            const beforeThink = content.slice(0, thinkStart)
+            const thinkContent = content.slice(thinkStart + 7, thinkEnd)
+            const afterThink = content.slice(thinkEnd + 8)
+            // details标签
+            const details = document.createElement('details')
+            const summary = document.createElement('summary')
+            summary.textContent = '深度思考中'
+            summary.className = 'cursor-pointer mb-2 text-gray-900'
+            details.appendChild(summary)
+            details.className = 'text-gray-500 text-sm mb-4 leading-relaxed'
+            const p = document.createElement('p')
+            p.textContent = thinkContent
+            details.appendChild(p)
+            messageBubble.innerHTML = marked.parse(beforeThink)
+            messageBubble.appendChild(details)
+            if (afterThink.trim()) {
+              const mainDiv = document.createElement('div')
+              mainDiv.className = 'prose'
+              mainDiv.innerHTML = marked.parse(afterThink)
+              messageBubble.appendChild(mainDiv)
+            }
+          } else {
+            messageBubble.innerHTML = marked.parse(content)
+          }
+        } else {
+          messageBubble.innerHTML = marked.parse(content)
+        }
 
         // 添加复制按钮
         const copyBtn = document.createElement('i')
         copyBtn.className = `fas fa-copy cursor-pointer mt-2 text-gray-500 hover:text-gray-700 text-xl`
         copyBtn.title = '复制消息'
         copyBtn.onclick = () => {
-          navigator.clipboard.writeText(content)
+          navigator.clipboard.writeText(
+            content.replace(/<think>[\s\S]*?<\/think>/g, '').trim()
+          )
           copyBtn.className = copyBtn.className.replace('fa-copy', 'fa-check')
           setTimeout(() => {
             copyBtn.className = copyBtn.className.replace('fa-check', 'fa-copy')
@@ -423,6 +572,7 @@
           const messages = chatData.get(currentChatId) || []
           messages.push({ content: message, isAI: false })
           chatData.set(currentChatId, messages)
+          await saveChatDetail(currentChatId, messages)
 
           // 立即创建AI消息容器和显示Loading状态
           const messageContainer = document.createElement('div')
@@ -644,6 +794,9 @@
             if (copyBtn) {
               copyBtn.classList.remove('hidden')
             }
+
+            // 保存AI消息到indexDB
+            await saveChatDetail(currentChatId, chatData.get(currentChatId))
           } catch (error) {
             console.error('API调用失败:', error)
             const messages = chatData.get(currentChatId)
@@ -675,6 +828,12 @@
           if (chatItem && chatMessages.children.length === 1) {
             chatItem.textContent =
               message.slice(0, 20) + (message.length > 20 ? '...' : '')
+            // 同步更新chatListArr和localStorage
+            const chatObj = chatListArr.find((c) => c.id === currentChatId)
+            if (chatObj) {
+              chatObj.name = chatItem.textContent
+              saveChatListToLocalStorage(chatListArr)
+            }
           }
         }
       }
@@ -692,8 +851,10 @@
         .getElementById('sendButton')
         .addEventListener('click', () => sendMessage())
 
-      // 创建初始会话
-      document.getElementById('newChat').click()
+      // 创建初始会话（如果没有历史会话）
+      if (chatListArr.length === 0) {
+        createNewChat()
+      }
     </script>
   </body>
 </html>
