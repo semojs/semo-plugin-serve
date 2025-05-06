@@ -18,3 +18,4 @@ lib/**/*.map
 .lintstagedrc
 eslint.config.ts
 example/*
+nodemon.json
