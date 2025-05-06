@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>404 Not Found</title>
+    <style>
+      :root {
+        --bg-color: #ffffff;
+        --text-color: #222222;
+        --secondary-color: #666666;
+        --border-color: #e0e0e0;
+        --primary-color: #3a3a3a;
+      }
+
+      [data-theme='dark'] {
+        --bg-color: #121212;
+        --text-color: #e0e0e0;
+        --secondary-color: #999999;
+        --border-color: #333333;
+        --primary-color: #f5f5f5;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]) {
+          --bg-color: #121212;
+          --text-color: #e0e0e0;
+          --secondary-color: #999999;
+          --border-color: #333333;
+          --primary-color: #f5f5f5;
+        }
+      }
+
+      @keyframes glow {
+        0% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.5;
+        }
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+
+      .container {
+        max-width: 600px;
+        padding: 4rem;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      h1 {
+        font-size: 8rem;
+        font-weight: 700;
+        margin: 0;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          var(--secondary-color) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+      }
+
+      p {
+        font-size: 1.5rem;
+        line-height: 1.6;
+        margin: 2rem 0;
+        color: var(--secondary-color);
+      }
+
+      .controls {
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        display: flex;
+        gap: 1rem;
+      }
+
+      button {
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        cursor: pointer;
+        color: var(--text-color);
+        opacity: 0.7;
+        transition: opacity 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      button:hover {
+        opacity: 1;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>404</h1>
+      <p class="en">Page not found</p>
+      <p class="zh hidden">页面未找到</p>
+    </div>
+
+    <div class="controls">
+      <button id="toggleLanguage">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M2 12h20" />
+          <path
+            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+          />
+        </svg>
+      </button>
+      <button id="toggleTheme">
+        <svg
+          class="theme-icon sun hidden"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="5" />
+          <path
+            d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+          />
+        </svg>
+        <svg
+          class="theme-icon moon"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </button>
+    </div>
+
+    <script>
+      // Language toggle functionality
+      const toggleLanguage = document.getElementById('toggleLanguage')
+      const enText = document.querySelector('.en')
+      const zhText = document.querySelector('.zh')
+
+      // Theme toggle functionality
+      const toggleTheme = document.getElementById('toggleTheme')
+
+      // Initialize from localStorage or system preferences
+      document.addEventListener('DOMContentLoaded', () => {
+        // Language initialization
+        const savedLang = localStorage.getItem('preferredLanguage')
+        const browserLang = navigator.language.startsWith('zh') ? 'zh' : 'en'
+        const initialLang = savedLang || browserLang
+
+        if (initialLang === 'zh') {
+          enText.classList.add('hidden')
+          zhText.classList.remove('hidden')
+        }
+
+        // Theme initialization
+        const savedTheme = localStorage.getItem('preferredTheme')
+        const systemPrefersDark = window.matchMedia(
+          '(prefers-color-scheme: dark)'
+        ).matches
+
+        if (savedTheme) {
+          document.documentElement.setAttribute('data-theme', savedTheme)
+        } else if (systemPrefersDark) {
+          document.documentElement.setAttribute('data-theme', 'dark')
+        }
+      })
+
+      // Language toggle handler
+      toggleLanguage.addEventListener('click', () => {
+        if (enText.classList.contains('hidden')) {
+          enText.classList.remove('hidden')
+          zhText.classList.add('hidden')
+          localStorage.setItem('preferredLanguage', 'en')
+        } else {
+          enText.classList.add('hidden')
+          zhText.classList.remove('hidden')
+          localStorage.setItem('preferredLanguage', 'zh')
+        }
+      })
+
+      // Theme toggle handler
+      const sunIcon = document.querySelector('.theme-icon.sun')
+      const moonIcon = document.querySelector('.theme-icon.moon')
+
+      function updateThemeIcon(isDark) {
+        if (isDark) {
+          sunIcon.classList.remove('hidden')
+          moonIcon.classList.add('hidden')
+        } else {
+          sunIcon.classList.add('hidden')
+          moonIcon.classList.remove('hidden')
+        }
+      }
+
+      // 初始化主题图标
+      updateThemeIcon(
+        document.documentElement.getAttribute('data-theme') === 'dark'
+      )
+
+      toggleTheme.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme')
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+        document.documentElement.setAttribute('data-theme', newTheme)
+        localStorage.setItem('preferredTheme', newTheme)
+        updateThemeIcon(newTheme === 'dark')
+      })
+    </script>
+  </body>
+</html>

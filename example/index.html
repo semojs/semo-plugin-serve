@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            typography: {
+              DEFAULT: {
+                css: {
+                  maxWidth: 'none',
+                  color: '#374151',
+                  a: {
+                    color: '#2563eb',
+                    '&:hover': {
+                      color: '#1d4ed8',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }
+    </script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.4.1/dist/typography.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* 默认字体设置 */
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif,
+          'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      pre {
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background-color: #f9fafb;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div class="flex h-screen">
+      <!-- 左侧导航条 -->
+      <div class="w-14 bg-gray-800 text-white flex flex-col items-center py-2">
+        <div class="mb-8">
+          <div class="text-white h-12 w-12">
+            <a
+              href="https://www.github.com/semojs/semo-plugin-serve"
+              target="_blank"
+            >
+              <?xml version="1.0" standalone="no"?>
+              <svg
+                version="1.0"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 180.000000 180.000000"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <metadata>
+                  Created by potrace 1.10, written by Peter Selinger 2001-2011
+                </metadata>
+                <g
+                  transform="translate(0.000000,180.000000) scale(0.100000,-0.100000)"
+                  stroke="none"
+                >
+                  <path
+                    d="M645 1463 c-11 -2 -41 -11 -67 -19 -44 -14 -48 -18 -48 -48 0 -77 94
+-203 189 -251 53 -27 145 -55 175 -54 19 0 18 1 -4 11 -163 69 -240 130 -286
+226 -31 65 -30 66 72 81 173 26 272 -39 327 -213 20 -64 22 -68 25 -38 6 59
+-33 164 -80 217 -59 67 -123 95 -213 94 -38 -1 -79 -3 -90 -6z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M820 1231 c0 -5 15 -19 34 -31 54 -33 141 -133 174 -200 45 -89 60
+-178 72 -430 6 -124 15 -229 19 -233 4 -4 11 23 14 60 7 85 59 265 101 358 50
+106 103 167 181 206 36 17 63 34 61 37 -10 10 -107 -21 -149 -48 -24 -15 -60
+-47 -80 -72 -41 -50 -87 -142 -87 -175 0 -13 -4 -23 -10 -23 -6 0 -10 32 -10
+75 0 155 -50 275 -154 373 -61 57 -166 122 -166 103z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M1470 1139 c-63 -10 -92 -23 -134 -60 -40 -34 -66 -77 -66 -106 0
+-13 5 -10 19 12 45 74 114 109 211 108 36 0 85 -6 108 -12 41 -11 43 -14 37
+-39 -19 -77 -145 -172 -229 -172 -32 0 -56 -10 -56 -22 0 -13 101 -3 168 17
+93 28 189 147 180 223 -3 22 -10 27 -58 38 -82 18 -130 21 -180 13z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M175 858 c-73 -40 -58 -112 28 -132 22 -5 28 -12 25 -29 -2 -17 -11
+-23 -39 -25 -23 -2 -40 2 -49 13 -12 14 -15 14 -31 -1 -25 -22 -24 -29 6 -42
+46 -21 113 -15 140 13 49 48 27 102 -48 119 -22 5 -28 12 -25 29 2 18 9 22 38
+21 19 0 41 -2 48 -5 8 -2 19 4 25 14 10 14 9 20 -3 27 -20 13 -90 12 -115 -2z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M344 776 c-27 -27 -34 -42 -34 -73 0 -49 24 -73 71 -73 35 0 79 23
+79 41 0 12 -37 12 -45 -1 -10 -16 -52 -12 -59 6 -10 27 -7 29 39 30 105 2 119
+104 15 104 -23 0 -42 -10 -66 -34z m94 -18 c2 -12 -6 -19 -33 -24 -45 -8 -54
+0 -30 26 22 24 58 23 63 -2z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M511 743 c-7 -38 -15 -78 -18 -90 -4 -19 -1 -23 20 -23 22 0 25 5 31
+52 8 58 28 88 59 88 21 0 21 -18 2 -107 -7 -30 -5 -33 17 -33 23 0 26 5 32 48
+7 57 29 92 58 92 22 0 22 -17 3 -107 -7 -30 -5 -33 16 -33 23 0 25 6 36 75 7
+41 10 82 7 90 -8 20 -54 19 -83 -1 -22 -16 -24 -16 -33 0 -11 20 -47 21 -76 0
+-20 -14 -22 -14 -22 0 0 9 -8 16 -18 16 -15 0 -21 -13 -31 -67z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M852 794 c-75 -52 -65 -164 15 -164 67 0 113 45 113 110 0 60 -75 92
+-128 54z m84 -48 c15 -62 -72 -116 -91 -56 -3 11 1 33 10 50 12 23 22 30 45
+30 23 0 31 -5 36 -24z"
+                    fill="currentColor"
+                  />
+                </g>
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div class="mt-auto cursor-pointer" id="settingsBtn">
+          <i class="fas fa-cog text-xl"></i>
+        </div>
+      </div>
+
+      <!-- 左侧会话列表 -->
+      <div class="w-64 bg-white border-r border-gray-200 flex flex-col">
+        <div class="p-4 border-b border-gray-200">
+          <button
+            id="newChat"
+            class="w-full bg-gray-900 text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-colors"
+          >
+            新建会话
+          </button>
+        </div>
+        <div id="chatList" class="flex-1 overflow-y-auto p-2 space-y-2">
+          <!-- 会话列表将在这里动态生成 -->
+        </div>
+      </div>
+
+      <!-- 右侧聊天区域 -->
+      <div class="flex-1 flex flex-col">
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+          <!-- 消息将在这里动态生成 -->
+        </div>
+        <div class="border-t border-gray-200 p-4 bg-white flex gap-2">
+          <textarea
+            id="messageInput"
+            class="flex-1 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-gray-400 transition-colors resize-none h-24"
+            placeholder="输入消息..."
+          ></textarea>
+          <button
+            id="sendButton"
+            class="bg-gray-900 text-white rounded-lg px-6 py-2 hover:bg-gray-800 transition-colors h-fit"
+          >
+            发送
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div
+      id="settingsModal"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-lg p-6 w-96">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-medium">设置</h3>
+          <button id="closeSettings" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Ollama 服务器地址</label
+            >
+            <input
+              type="text"
+              id="ollamaUrl"
+              class="w-full border border-gray-300 rounded-md px-3 py-2"
+              placeholder="http://localhost:11434"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >模型名称</label
+            >
+            <input
+              type="text"
+              id="modelName"
+              class="w-full border border-gray-300 rounded-md px-3 py-2"
+              placeholder="llama2"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >系统提示词</label
+            >
+            <textarea
+              id="systemPrompt"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 h-32 resize-none"
+              placeholder="请输入系统提示词..."
+            ></textarea>
+          </div>
+          <div class="flex gap-2">
+            <button
+              id="saveSettings"
+              class="flex-1 bg-gray-900 text-white rounded-md px-4 py-2 hover:bg-gray-800 transition-colors"
+            >
+              保存设置
+            </button>
+            <button
+              id="checkOllama"
+              class="flex-1 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700 transition-colors"
+            >
+              检测连接
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 从localStorage加载设置
+      const ollamaUrlInput = document.getElementById('ollamaUrl')
+      const modelNameInput = document.getElementById('modelName')
+      const systemPromptInput = document.getElementById('systemPrompt')
+      const settingsModal = document.getElementById('settingsModal')
+
+      // 加载保存的设置
+      if (localStorage.getItem('ollamaUrl')) {
+        ollamaUrlInput.value = localStorage.getItem('ollamaUrl')
+      }
+      if (localStorage.getItem('modelName')) {
+        modelNameInput.value = localStorage.getItem('modelName')
+      }
+      if (localStorage.getItem('systemPrompt')) {
+        systemPromptInput.value = localStorage.getItem('systemPrompt')
+      }
+
+      // 设置按钮点击事件
+      document.getElementById('settingsBtn').addEventListener('click', () => {
+        settingsModal.classList.remove('hidden')
+      })
+
+      // 关闭设置模态框
+      document.getElementById('closeSettings').addEventListener('click', () => {
+        settingsModal.classList.add('hidden')
+      })
+
+      // 保存设置
+      document.getElementById('saveSettings').addEventListener('click', () => {
+        localStorage.setItem('ollamaUrl', ollamaUrlInput.value)
+        localStorage.setItem('modelName', modelNameInput.value)
+        localStorage.setItem('systemPrompt', systemPromptInput.value)
+        settingsModal.classList.add('hidden')
+      })
+
+      // 检测Ollama连接
+      document
+        .getElementById('checkOllama')
+        .addEventListener('click', async () => {
+          const ollamaUrl = ollamaUrlInput.value.trim()
+          if (!ollamaUrl) {
+            alert('请先输入Ollama服务器地址')
+            return
+          }
+
+          try {
+            const response = await fetch('/api/check-ollama', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ ollamaUrl }),
+            })
+
+            const result = await response.json()
+            if (result.data.success) {
+              alert('Ollama服务连接成功！')
+            } else {
+              alert(`连接失败: ${result.msg}`)
+            }
+          } catch (error) {
+            console.error('检测连接时出错:', error)
+            alert('检测连接时发生错误，请检查控制台')
+          }
+        })
+
+      // 全局聊天数据存储
+      const chatData = new Map()
+      // 存储每个会话的响应控制器
+      const responseControllers = new Map()
+      let currentChatId = null
+      const chatList = document.getElementById('chatList')
+      const chatMessages = document.getElementById('chatMessages')
+      const messageInput = document.getElementById('messageInput')
+
+      // 创建新会话
+      document.getElementById('newChat').addEventListener('click', () => {
+        const chatId = uuidv4()
+        createChatItem(chatId)
+        switchChat(chatId)
+      })
+
+      // 创建会话项
+      function createChatItem(chatId) {
+        const chatItem = document.createElement('div')
+        chatItem.className =
+          'p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors'
+        chatItem.textContent = `会话 ${chatList.children.length + 1}`
+        chatItem.dataset.chatId = chatId
+        chatItem.onclick = () => switchChat(chatId)
+        chatList.insertBefore(chatItem, chatList.firstChild)
+      }
+
+      // 切换会话
+      function switchChat(chatId) {
+        // 如果当前会话有正在进行的响应，将其保存到对应的会话中
+        if (currentChatId) {
+          const currentMessages = chatData.get(currentChatId) || []
+          const lastMessage = currentMessages[currentMessages.length - 1]
+          if (lastMessage && lastMessage.isAI && lastMessage.messageContainer) {
+            lastMessage.messageContainer.style.display = 'none'
+          }
+        }
+
+        currentChatId = chatId
+        // 清空消息区域
+        chatMessages.innerHTML = ''
+        // 显示当前会话的历史消息
+        const messages = chatData.get(chatId) || []
+        messages.forEach((msg) => {
+          if (msg.messageBubble && msg.isAI) {
+            // 如果存在消息气泡引用，直接使用它
+            const container =
+              msg.messageContainer || msg.messageBubble.parentElement
+            container.style.display = ''
+            chatMessages.appendChild(container)
+          } else {
+            addMessage(msg.content, msg.isAI)
+          }
+        })
+        // 高亮当前会话
+        Array.from(chatList.children).forEach((item) => {
+          item.classList.toggle('bg-gray-100', item.dataset.chatId === chatId)
+        })
+      }
+
+      // 添加消息到聊天区域
+      function addMessage(content, isAI = false) {
+        const messageDiv = document.createElement('div')
+        messageDiv.className = `flex items-start gap-2 ${isAI ? 'justify-start' : 'justify-end'}`
+
+        const messageContentDiv = document.createElement('div')
+        messageContentDiv.className = 'flex flex-col items-start max-w-[70%]'
+
+        const messageBubble = document.createElement('div')
+        messageBubble.className = `rounded-lg px-4 py-2 ${isAI ? 'bg-white border border-gray-200 prose' : 'bg-gray-900 text-white prose prose-invert'}`
+        messageBubble.innerHTML = marked.parse(content)
+
+        // 添加复制按钮
+        const copyBtn = document.createElement('i')
+        copyBtn.className = `fas fa-copy cursor-pointer mt-2 text-gray-500 hover:text-gray-700 text-xl`
+        copyBtn.title = '复制消息'
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(content)
+          copyBtn.className = copyBtn.className.replace('fa-copy', 'fa-check')
+          setTimeout(() => {
+            copyBtn.className = copyBtn.className.replace('fa-check', 'fa-copy')
+          }, 1000)
+        }
+
+        const icon = document.createElement('i')
+        icon.className = isAI
+          ? 'fas fa-robot text-gray-600 text-2xl'
+          : 'fas fa-user text-gray-600 text-2xl'
+
+        messageContentDiv.appendChild(messageBubble)
+        messageContentDiv.appendChild(copyBtn)
+
+        if (isAI) {
+          messageDiv.appendChild(icon)
+          messageDiv.appendChild(messageContentDiv)
+        } else {
+          messageDiv.appendChild(messageContentDiv)
+          messageDiv.appendChild(icon)
+        }
+
+        chatMessages.appendChild(messageDiv)
+        chatMessages.scrollTop = chatMessages.scrollHeight
+        return messageBubble
+      }
+
+      // 发送消息函数
+      async function sendMessage() {
+        const message = messageInput.value.trim()
+        if (message && currentChatId) {
+          messageInput.value = ''
+
+          // 添加用户消息并保存到聊天数据
+          addMessage(message, false)
+          const messages = chatData.get(currentChatId) || []
+          messages.push({ content: message, isAI: false })
+          chatData.set(currentChatId, messages)
+
+          // 立即创建AI消息容器和显示Loading状态
+          const messageContainer = document.createElement('div')
+          messageContainer.className = 'flex items-start gap-2 justify-start'
+
+          const iconContainer = document.createElement('div')
+          iconContainer.className = 'flex flex-row items-center gap-2'
+
+          const icon = document.createElement('i')
+          icon.className = 'fas fa-robot text-gray-600'
+
+          // 创建loading图标
+          const loadingIcon = document.createElement('i')
+          loadingIcon.className = 'fas fa-spinner fa-spin text-gray-600'
+          loadingIcon.id = `loading-${Date.now()}`
+
+          iconContainer.appendChild(icon)
+          iconContainer.appendChild(loadingIcon)
+          messageContainer.appendChild(iconContainer)
+
+          chatMessages.appendChild(messageContainer)
+          chatMessages.scrollTop = chatMessages.scrollHeight
+
+          const messageData = {
+            content: '',
+            isAI: true,
+            messageContainer,
+            chatId: currentChatId, // 添加chatId标识
+          }
+          messages.push(messageData)
+          chatData.set(currentChatId, messages)
+
+          // 获取Ollama配置
+          const ollamaUrl =
+            localStorage.getItem('ollamaUrl') || 'http://localhost:11434'
+          const modelName = localStorage.getItem('modelName') || 'llama2'
+          const systemPrompt = localStorage.getItem('systemPrompt') || ''
+
+          // 调用Ollama API
+          try {
+            const response = await fetch('/api/chat', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                message,
+                ollamaUrl,
+                modelName,
+                systemPrompt,
+              }),
+            })
+            if (!response.ok) {
+              const errorData = await response.json()
+
+              throw new Error(errorData.msg)
+            }
+
+            const reader = response.body.getReader()
+            const decoder = new TextDecoder()
+            let aiMessage = ''
+            let isFirstResponse = true // 添加标记，用于判断是否是第一次响应
+
+            let copyBtn
+            while (true) {
+              const { done, value } = await reader.read()
+              if (done) break
+
+              // 解析响应数据
+              const text = decoder.decode(value)
+
+              const lines = text.split('\n')
+
+              for (const line of lines) {
+                if (line.trim()) {
+                  try {
+                    const data = JSON.parse(line)
+                    if (data.response) {
+                      // 如果是第一次收到响应，移除 loading 图标
+                      if (isFirstResponse) {
+                        const loadingIcon =
+                          iconContainer.querySelector('.fa-spinner')
+                        if (loadingIcon) {
+                          loadingIcon.remove()
+                        }
+                        isFirstResponse = false
+                      }
+                      aiMessage += data.response
+                    }
+                  } catch (e) {
+                    console.error('Parse error:', e)
+                  }
+                }
+              }
+
+              // 处理AI消息中的思考标签
+              let processedMessage = ''
+              let thinkingContent = ''
+              let details = null
+
+              // 更新AI消息显示
+              const messages = chatData.get(messageData.chatId)
+              const lastMessage = messages[messages.length - 1]
+              if (lastMessage.chatId === messageData.chatId) {
+                lastMessage.content = aiMessage
+              }
+
+              // 如果还没有创建消息气泡，创建一个
+              if (!lastMessage.messageBubble) {
+                const messageBubble = document.createElement('div')
+                messageBubble.className =
+                  'rounded-lg px-4 py-2 bg-white border border-gray-200'
+
+                lastMessage.messageBubble = messageBubble
+                // 添加复制按钮
+                copyBtn = document.createElement('i')
+                copyBtn.className = `hidden fas fa-copy cursor-pointer mt-2 text-gray-500 hover:text-gray-700 text-xl`
+                copyBtn.title = '复制消息'
+                copyBtn.onclick = () => {
+                  navigator.clipboard.writeText(
+                    lastMessage.content
+                      .replace(/<think>[\s\S]*?<\/think>/g, '')
+                      .trim()
+                  )
+                  copyBtn.className = copyBtn.className.replace(
+                    'fa-copy',
+                    'fa-check'
+                  )
+                  setTimeout(() => {
+                    copyBtn.className = copyBtn.className.replace(
+                      'fa-check',
+                      'fa-copy'
+                    )
+                  }, 1000)
+                }
+                const messageContentDiv = document.createElement('div')
+                messageContentDiv.className =
+                  'flex flex-col items-start max-w-[70%]'
+                messageContentDiv.appendChild(messageBubble)
+                messageContentDiv.appendChild(copyBtn)
+                lastMessage.messageContainer.appendChild(messageContentDiv)
+              }
+
+              // 处理消息内容
+              let thinkStartIndex = aiMessage.indexOf('<think>')
+
+              // 确保消息区域滚动到底部
+              chatMessages.scrollTop = chatMessages.scrollHeight
+
+              if (thinkStartIndex !== -1) {
+                // 添加think标签之前的内容
+                processedMessage = aiMessage.slice(0, thinkStartIndex)
+
+                // 跳过<think>标签
+                thinkStartIndex += 7
+
+                // 查找</think>标签
+                let thinkEndIndex = aiMessage.indexOf(
+                  '</think>',
+                  thinkStartIndex
+                )
+
+                // 创建details元素
+                details = document.createElement('details')
+                const summary = document.createElement('summary')
+                summary.textContent = '深度思考中'
+                summary.className = 'cursor-pointer mb-2 text-gray-900'
+                details.appendChild(summary)
+                details.className = 'text-gray-500 text-sm mb-4 leading-relaxed'
+                lastMessage.messageBubble.innerHTML = processedMessage
+                lastMessage.messageBubble.appendChild(details)
+
+                if (thinkEndIndex !== -1) {
+                  // 提取思考内容
+                  thinkingContent = aiMessage.slice(
+                    thinkStartIndex,
+                    thinkEndIndex
+                  )
+                  const p = document.createElement('p')
+                  p.textContent = thinkingContent
+                  details.appendChild(p)
+
+                  // 关闭details并更新状态
+                  details.removeAttribute('open')
+                  summary.textContent = '已完成思考'
+
+                  // 添加think标签后的内容
+                  const remainingContent = document.createElement('div')
+                  remainingContent.className = 'prose'
+                  remainingContent.innerHTML = marked.parse(
+                    aiMessage.slice(thinkEndIndex + 8)
+                  )
+                  lastMessage.messageBubble.appendChild(remainingContent)
+                  // 确保消息区域滚动到底部
+                  chatMessages.scrollTop = chatMessages.scrollHeight
+                } else {
+                  // 如果没有结束标签，保持details打开状态
+                  details.setAttribute('open', '')
+                  const p = document.createElement('p')
+                  p.textContent = aiMessage.slice(thinkStartIndex)
+                  details.appendChild(p)
+                  // 确保消息区域滚动到底部
+                  chatMessages.scrollTop = chatMessages.scrollHeight
+                }
+                details = null
+              } else {
+                // 如果没有think标签，直接显示完整消息
+                lastMessage.messageBubble.innerHTML = marked.parse(aiMessage)
+              }
+
+              // 更新最终消息内容
+              if (processedMessage && !lastMessage.messageBubble.innerHTML) {
+                lastMessage.messageBubble.innerHTML =
+                  marked.parse(processedMessage)
+              }
+            }
+
+            // 去掉 messageContentDiv 的 hidden 类
+            if (copyBtn) {
+              copyBtn.classList.remove('hidden')
+            }
+          } catch (error) {
+            console.error('API调用失败:', error)
+            const messages = chatData.get(currentChatId)
+            const lastMessage = messages[messages.length - 1]
+
+            // 如果最后一条消息是空的AI响应，从chatData和DOM中删除它
+            if (lastMessage && lastMessage.isAI && !lastMessage.content) {
+              messages.pop()
+              if (messageContainer) {
+                messageContainer.remove()
+              }
+            }
+
+            // 添加错误消息
+            const errorMessage = addMessage(
+              `抱歉，获取AI响应时出错: ${error.message}`,
+              true
+            )
+
+            if (loadingIcon) {
+              loadingIcon.remove()
+            }
+          }
+
+          // 更新会话标题（仅在第一条消息时）
+          const chatItem = Array.from(chatList.children).find(
+            (item) => item.dataset.chatId === currentChatId
+          )
+          if (chatItem && chatMessages.children.length === 1) {
+            chatItem.textContent =
+              message.slice(0, 20) + (message.length > 20 ? '...' : '')
+          }
+        }
+      }
+
+      // 处理按键发送
+      messageInput.addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault()
+          await sendMessage()
+        }
+      })
+
+      // 处理按钮发送
+      document
+        .getElementById('sendButton')
+        .addEventListener('click', () => sendMessage())
+
+      // 创建初始会话
+      document.getElementById('newChat').click()
+    </script>
+  </body>
+</html>

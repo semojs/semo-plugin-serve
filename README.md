@@ -2,8 +2,8 @@
 
 一个简易的 HTTP Server 工具，类似的工具有很多，包括但不限于：
 
-* [http-server](https://www.npmjs.com/package/http-server)
-* [serve](https://www.npmjs.com/package/serve)
+- [http-server](https://www.npmjs.com/package/http-server)
+- [serve](https://www.npmjs.com/package/serve)
 
 还有一些工具，比如 `hexo`，本来是个博客工具，也自带了 HTTP Server 的功能，`umi`，本来是个前端开发脚手架，也自带了启动 HTTP Server 的功能，当然，还有大名鼎鼎的 `create-react-app` 等等，而且 node 本身写一个简单的Web服务器也不是很复杂，那为什么还要去做一个新的轮子呢？
 
@@ -15,13 +15,13 @@
 
 ## 特性
 
-* 同时支持静态资源服务和后端接口服务，
-* 后端服务，目录结构就是路由结构
-* 后端服务路由可以灵活配置，内置了参数验证机制
-* 后端服务可以引入全局中间件和单个路由中间件，也可以禁用内置中间件
-* 支持一些个性化选项，个性化选项也都可以在配置文件(`.semorc.yml`)中设置
-* 支持端口占用自动检测
-* 支持和SPA模式和404模式
+- 同时支持静态资源服务和后端接口服务，
+- 后端服务，目录结构就是路由结构
+- 后端服务路由可以灵活配置，内置了参数验证机制
+- 后端服务可以引入全局中间件和单个路由中间件，也可以禁用内置中间件
+- 支持一些个性化选项，个性化选项也都可以在配置文件(`.semorc.yml`)中设置
+- 支持端口占用自动检测
+- 支持和SPA模式和404模式
 
 ## 安装
 
@@ -34,25 +34,44 @@ npm i -g @semo/cli semo-plugin-serve
 ```bash
 semo serve [publicDir]
 
-simple server tool
+Simple server tool
 
-选项：
-  --port, -p                                    server port                                              [默认值: false]
-  --list, -l                                    list routes
-  --init-koa, -i                                initial koa application                                  [默认值: false]
-  --api-prefix                                  prefix all routes                                       [默认值: "/api"]
-  --spa                                         fallback to index.html
-  --gzip                                        enable gzip
-  --routeDir                                    routes location
-  --publicDir                                   static files location
-  --file-index                                  index file name                                   [默认值: "index.html"]
-  --file-404                                    index file name                                          [默认值: false]
-  --disable-internal-middleware-custom-error    disable internal middleware custom error
-  --disable-internal-middleware-custom-static   disable internal middleware custom static
-  --disable-internal-middleware-custom-router   disable internal middleware custom router
-  --disable-internal-middleware-koa-logger      disable internal middleware koa-logger
-  --disable-internal-middleware-koa-bodyparser  disable internal middleware koa-bodyparser
-  --disable-internal-middleware-koa-kcors       disable internal middleware kcors
+Server Controls:
+      --port         server port                                                           [default: 3000]
+  -Y, --yes          Say yes to use new port when default port in use
+  -L, --list-routes  List routes
+      --api-prefix   Prefix all routes                                                       [default: ""]
+      --spa          Fallback to index.html
+      --gzip         Enable gzip
+      --route-dir    Routes location
+      --root-dir     Base root directory, default is current directory
+      --public-dir   Static files location                                                  [default: "."]
+      --file-index   Index file name                                               [default: "index.html"]
+      --file-404     404 file name
+      --static-404   If use simple 404 response, only work when file-404 is not set              [boolean]
+  -P, --proxy        Provide a proxy route /proxy
+
+Internal Controls:
+      --disable-index-directory                     List directory files if file index not exist [boolean]
+      --disable-internal-middleware-custom-error    Disable internal middleware custom error     [boolean]
+      --disable-internal-middleware-custom-static   Disable internal middleware custom static    [boolean]
+      --disable-internal-middleware-custom-routes   Disable internal middleware custom routes    [boolean]
+      --disable-internal-middleware-koa-logger      Disable internal middleware koa-logger       [boolean]
+      --disable-internal-middleware-koa-bodyparser  Disable internal middleware koa-bodyparser   [boolean]
+      --disable-internal-middleware-koa-kcors       Disable internal middleware kcors            [boolean]
+      --disable-health-check-route                  Disable health check route                   [boolean]
+
+Views Controls:
+      --views-engine     Set koa-views engine                                        [default: "nunjucks"]
+      --views-extension  Set koa-views template extension                                [default: "html"]
+      --views-dir        Set koa-views template dir                                          [default: ""]
+
+Options:
+      --verbose                 Enable verbose logging                          [boolean] [default: false]
+  -B, --open-browser, --open    Auto open browser                                                [boolean]
+  -C, --clear-console, --clear  Auto clear console                                               [boolean]
+  -h, --help                    Show help                                                        [boolean]
+  -v, --version                 Show version number                                              [boolean]
 ```
 
 ## 命令行使用说明
@@ -78,15 +97,6 @@ semo serve [publicDir]
 semo serve # 默认当前目录
 ```
 
-### watch 模式
-
-借助 nodemon 模块
-
-```
-npm i -g nodemon
-nodemon --exec 'semo serve'
-```
-
 ## 路由系统说明
 
 ### 一个路由的样子
@@ -97,11 +107,7 @@ nodemon --exec 'semo serve'
 export const name = 'signup' // 给路由起个名字
 export const method = 'post' // 支持各种 HTTP 请求方法
 export const path = 'abc' // 自动添加到路径路由的后面
-export const middleware = [] // 为单个路由指定前置中间件
-export const validate = { // 请求参数验证
-  username: 'required'
-}
-export const handler = async ctx => {} // 路由回调
+export const handler = async (ctx) => {} // 路由回调
 ```
 
 #### 简单版
@@ -130,25 +136,29 @@ ctx.error(10001, '自定义错误消息', 405)
 throw new ctx.Exception(10001, '重写错误消息')
 ```
 
-#### Mock 数据
+#### 验证参数
 
-命令内置了 `mockjs` 库，只需要通过 `ctx.Mock` 和 `ctx.mock` 就能访问，`ctx.mock === ctx.Mock.mock`。
+支持 zod 和 Joi 两种参数验证库。你仍然需要本地安装，定义后，内置的路由中间件可以识别。
+
+```js
+export const validate = {
+  body: z.object({
+    name: z.string(),
+  }),
+}
+```
 
 #### gzip 压缩
 
 当选项 `--gzip` 设置为 true 以后，默认凡是内容类型包含 text 的响应都会进行 gzip 压缩，如果想关闭可以在路由响应函数里进行如下操作：
 
 ```js
-module.export = async ctx => {
+module.export = async (ctx) => {
   ctx.compress = false
   // 或
   ctx.gzip = false
 }
 ```
-
-### 路由前缀
-
-我们默认的路由前缀是 /api，因为默认的使用场景是前端静态目录和后端动态接口都支持，如果仅仅是使用后端功能，可以改写前缀，或者清空前缀。
 
 ### 特殊的路由
 
@@ -160,38 +170,39 @@ index 文件名的路由在我们对路由的理解里有特殊含义，因为�
 
 如果不使用SPA模式，并且配置了 `--file-404` 选项，比如404.html，则所有不存在的404静态资源都会使用这个配置的静态页面进行输出，如果设置为 false 关闭了这个选项，则会输出为 `Not found` 字符串。
 
-## 中间件的禁用和扩展
-
-通过工具提供的选项可以看出，所有内置的中间件都可以禁用，而且可以通过 `--init-app` 的选项注入一个模块来添加更多的中间件，两个特性一起使用的话，可以完全自定义 koa 所需要的所有的中间件，当然如果是这么做的话，那本工具也就没必要使用了。
-
-```js
-// init-app.js
-// semo serve --init-app init-app.js
-module.exports = (app) => {
-  app.use(async (ctx, next) => {
-    
-    await next()
-  })
-}
-```
-
 ## APIs
 
-如果不想用 Semo 来调度也可以直接已模块的方式引入，参数可以参考命令行选项
+如果不想用 Semo 来调度也可以直接已模块的方式引入，参数可以参考命令行选项，也可以根据 IDE 的提示来查看， Typescript 项目可以导入类型： SemoServerOptions。默认只需要很少的参数即可，大部分参数都有默认值。
 
 ```js
 import { startServer } from 'semo-plugin-serve'
 
-async() {
-  await startServer({
-    publicDir: '.'
-  })
-}
+startServer({
+  port: 3000,
+  apiPrefix: '/api',
+  rootDir: path.resolve(__dirname, '../'),
+  routeDir: 'src/routes',
+  publicDir: 'public',
+  file404: '404.html',
+  fileIndex: 'index.html',
+  addRoutes: (router) => {
+    // access /api/hello-world
+    router.get('/hello-world', async (ctx) => {
+      ctx.body = 'Hello World'
+    })
+  },
+  initApp: (app) => {
+    app.use(async (ctx, next) => {
+      console.log('initApp middleware')
+      await next()
+    })
+  },
+})
 ```
 
 ## Constants
 
-* SEMO_SERVE_DISABLE_ERROR_STACK=1
+- SEMO_SERVE_DISABLE_ERROR_STACK=1
 
 ## 开源协议
 
