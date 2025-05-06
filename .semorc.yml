@@ -6,21 +6,3 @@ extendDir: lib/extends
 extendMakeDir: src/extends
 hookDir: lib/hooks
 hookMakeDir: src/hooks
-
-apiPrefix: /api
-rootDir: example
-publicDir: public
-routeDir: src/routes
-# gzip: true
-# initApp: 'init.js' # 初始化加载自定义中间件
-# viewsDir: 'views'
-# viewsExtension: 'html'
-# viewsEngine: 'nunjucks'
-
-# disableInternalMiddlewareKcors: true
-# disableInternalMiddlewareKoaBodyparser: true
-# disableInternalMiddlewareKoaLogger: true
-# disableInternalMiddlewareCustomError: true
-
-file404: '404.html'
-# static404: true

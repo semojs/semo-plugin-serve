@@ -22,12 +22,12 @@ ${userPrompt}
 [/USER]
 
 [ASSISTANT]
-让我用 Markdown 格式为你回答这个问题：
+Let me answer this question for you in Markdown format:
 
 `
   }
 
-  // 设置响应头，支持流式传输和CORS
+  // Set response headers for streaming and CORS
   ctx.set({
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -52,21 +52,21 @@ ${userPrompt}
       { responseType: 'stream' }
     )
 
-    // 获取响应流
+    // Get response stream
     const stream = response.data
 
     ctx.body = stream
 
-    // 错误处理
+    // Error handling
     stream.on('error', (err) => {
       console.error('Stream error:', err)
       ctx.res.end()
     })
-    // 超时处理
+    // Timeout handling
     const timeout = setTimeout(() => {
       stream.destroy()
       ctx.res.end()
-    }, 60000) // 60秒超时
+    }, 60000) // 60 seconds timeout
 
     stream.on('end', () => {
       clearTimeout(timeout)

@@ -9,16 +9,16 @@ import {
 } from '../common/exception.js'
 
 export const errorMiddleware = async (ctx, next) => {
-  // 默认以 JSON 的方式返回
+  // Default to return JSON format
   ctx.json = true
 
-  // 默认错误码定义
+  // Default error codes definition
   ctx.errors = errors
 
-  // 默认异常类
+  // Default exception class
   ctx.Exception = Exception
 
-  // 添加自定义错误码
+  // Add custom error codes
   ctx.error = (code, msg, status = 200, info = null) => {
     if (!code || !_.isInteger(code) || !_.isInteger(status)) {
       throw new ctx.Exception(ERROR_CODE_INVALID)
@@ -57,7 +57,7 @@ export const errorMiddleware = async (ctx, next) => {
     }
 
     if (e instanceof Exception) {
-      // 有准备的已知错误
+      // Prepared known error
       ctx.status = e.status
       ctx.body = {
         reqId: ctx.reqId,
@@ -69,19 +69,19 @@ export const errorMiddleware = async (ctx, next) => {
         ctx.body.info = e.info
       }
     } else {
-      // 未知错误
+      // Unknown error
       ctx.status = 500
       ctx.body = {
         reqId: ctx.reqId,
         code: 1,
-        msg: '未知错误',
+        msg: 'Unknown error',
       }
     }
     if (
       process.env.SEMO_SERVE_DISABLE_ERROR_STACK !== '1' &&
       process.env.NODE_ENV !== 'production'
     ) {
-      ctx.body.stack = e.stack // 非线上环境，调用栈返给前端
+      ctx.body.stack = e.stack // In non-production environment, return stack trace to frontend
     }
   }
 }

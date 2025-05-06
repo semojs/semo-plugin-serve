@@ -1,11 +1,20 @@
 import _ from 'lodash'
 
-export const errors = {
-  1: { msg: '未知错误', status: 500 },
-  2: { msg: '错误码无效', status: 400 },
-  3: { msg: '参数校验失败', status: 400 },
-  4: { msg: '路由未定义', status: 400 },
-  5: { msg: '服务器内部错误', status: 500 },
+export interface ErrorItem {
+  msg: string
+  status: number
+}
+
+export interface ErrorList {
+  [key: number]: ErrorItem
+}
+
+export const errors: ErrorList = {
+  1: { msg: 'Unknown error', status: 500 },
+  2: { msg: 'Invalid error code', status: 400 },
+  3: { msg: 'Parameter validation failed', status: 400 },
+  4: { msg: 'Route not defined', status: 400 },
+  5: { msg: 'Internal server error', status: 500 },
 }
 
 export const ERROR_UNKNOWN = 1
@@ -22,17 +31,17 @@ export class Exception extends Error {
 
   constructor(code, msg, status, info = '') {
     let errMsg
-    const errCode = code || 1 // 默认 code = 1
+    const errCode = code || ERROR_UNKNOWN
     if (msg || errors[errCode]) {
-      if (_.isString(errors[errCode])) {
-        errMsg = msg || errors[errCode] || ''
-        status = errors[errCode].status || 200
-      } else {
+      if (_.isObject(errors[errCode])) {
         errMsg = msg || errors[errCode].msg || ''
-        status = errors[errCode].status || 200
+        status = status || errors[errCode].status || 200
+      } else {
+        errMsg = msg || ''
+        status = status || 200
       }
     } else {
-      errMsg = '未定义错误'
+      errMsg = 'Undefined error'
       status = 500
     }
 

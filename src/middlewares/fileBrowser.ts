@@ -4,40 +4,50 @@ import path from 'node:path'
 import { ERROR_INTERNAL } from '../common/exception.js'
 import { SemoServerOptions } from '../common/types.js'
 
-// 文件浏览器中间件
+const isFileExist = async (filePath) => {
+  try {
+    await fs.access(filePath)
+    return true
+  } catch {
+    return false
+  }
+}
+
+// File browser middleware
 export const fileBrowser = function (opts: SemoServerOptions) {
   return async (ctx, next) => {
     await next()
     if (ctx.body) return
 
-    // 获取请求路径
+    // Get request path
     const reqPath = ctx.path
-    // 将请求路径转换为实际文件系统路径
+    // Convert request path to actual filesystem path
     const fullPath = path.resolve(
       opts.publicDir,
       decodeURIComponent(reqPath.replace(/^\//, ''))
     )
+    const fileIndexExists = await isFileExist(opts.fileIndex)
     try {
-      if (reqPath === '/') {
-        // 如果请求路径为空且存在 index.html，则返回它，相当于模拟把 index.html 放到 public 下提供首页
+      if (reqPath === '/' && fileIndexExists) {
+        // If request path is empty and index.html exists, return it as homepage
         ctx.status = 200
         ctx.type = 'text/html'
-        await fs.access(opts.fileIndex)
         ctx.body = await fs.readFile(opts.fileIndex)
       } else {
         try {
           const stats = await fs.stat(fullPath)
           if (stats.isDirectory()) {
-            // 如果是目录，先尝试查找 index.html
-            try {
-              const indexPath = path.join(fullPath, 'index.html')
+            // If it's a directory, first try to find index.html
+            const indexPath = path.join(fullPath, 'index.html')
+            const indexPathExists = await isFileExist(indexPath)
+            if (indexPathExists) {
               await fs.access(indexPath)
-              // 如果 index.html 存在，则返回它
+              // If index.html exists, return it
               ctx.status = 200
               ctx.type = 'text/html'
               ctx.body = await fs.readFile(indexPath)
-            } catch {
-              // 如果没有 index.html，则显示目录列表
+            } else {
+              // If no index.html, show directory listing
               if (!opts.disableIndexDirectory) {
                 const files = await fs.readdir(fullPath)
                 const fileList = await Promise.all(
@@ -54,7 +64,7 @@ export const fileBrowser = function (opts: SemoServerOptions) {
                 )
 
                 ctx.status = 200
-                // 生成 HTML 页面
+                // Generate HTML page
                 ctx.type = 'text/html'
                 ctx.body = `
               <!DOCTYPE html>
@@ -111,13 +121,13 @@ export const fileBrowser = function (opts: SemoServerOptions) {
               </html>
             `
               } else {
-                // 如果禁用了目录列表，则返回403
+                // If directory listing is disabled, return 403
                 ctx.status = 403
                 ctx.body = 'Directory listing is disabled'
               }
             }
           } else {
-            // 如果是文件，则直接返回文件内容
+            // If it's a file, return file content directly
             ctx.type = mime.lookup(fullPath) || 'application/octet-stream'
             ctx.body = await fs.readFile(fullPath)
           }
@@ -125,7 +135,7 @@ export const fileBrowser = function (opts: SemoServerOptions) {
           if (opts.apiPrefix && reqPath.startsWith(opts.apiPrefix)) {
             // Do nothing, give to final middleware to handle
           } else {
-            // 如果文件不存在，则返回404
+            // If file doesn't exist, return 404
             if (opts.file404) {
               ctx.type = 'text/html'
               ctx.body = await fs.readFile(opts.file404)
@@ -142,7 +152,7 @@ export const fileBrowser = function (opts: SemoServerOptions) {
   }
 }
 
-// 格式化文件大小
+// Format file size
 function formatFileSize(bytes) {
   if (bytes === 0) return '0 Bytes'
   const k = 1024

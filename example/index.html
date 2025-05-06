@@ -38,7 +38,6 @@
       rel="stylesheet"
     />
     <style>
-      /* 默认字体设置 */
       body {
         font-family:
           -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
@@ -59,7 +58,7 @@
   </head>
   <body class="bg-gray-50">
     <div class="flex h-screen">
-      <!-- 左侧导航条 -->
+      <!-- Nav -->
       <div class="w-14 bg-gray-800 text-white flex flex-col items-center py-2">
         <div class="mb-8">
           <div class="text-white h-12 w-12">
@@ -136,55 +135,64 @@
             </a>
           </div>
         </div>
-        <div class="mt-auto cursor-pointer" id="settingsBtn">
-          <i class="fas fa-cog text-xl"></i>
+        <div class="mt-auto flex flex-col gap-4">
+          <div
+            class="cursor-pointer text-gray-400 hover:text-red-500"
+            id="clearAllBtn"
+            title="Clear All Chats"
+          >
+            <i class="fas fa-trash text-xl"></i>
+          </div>
+          <div class="cursor-pointer" id="settingsBtn">
+            <i class="fas fa-cog text-xl"></i>
+          </div>
         </div>
       </div>
 
-      <!-- 左侧会话列表 -->
+      <!-- Session List -->
       <div class="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div class="p-4 border-b border-gray-200">
           <button
             id="newChat"
             class="w-full bg-gray-900 text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-colors"
           >
-            新建会话
+            New Chat
           </button>
         </div>
         <div id="chatList" class="flex-1 overflow-y-auto p-2 space-y-2">
-          <!-- 会话列表将在这里动态生成 -->
+          <!-- Chat list will be dynamically generated here -->
         </div>
       </div>
 
-      <!-- 右侧聊天区域 -->
+      <!-- Right chat area -->
       <div class="flex-1 flex flex-col">
         <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
-          <!-- 消息将在这里动态生成 -->
+          <!-- Messages will be dynamically generated here -->
         </div>
         <div class="border-t border-gray-200 p-4 bg-white flex gap-2">
           <textarea
             id="messageInput"
             class="flex-1 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-gray-400 transition-colors resize-none h-24"
-            placeholder="输入消息..."
+            placeholder="Type a message..."
           ></textarea>
           <button
             id="sendButton"
             class="bg-gray-900 text-white rounded-lg px-6 py-2 hover:bg-gray-800 transition-colors h-fit"
           >
-            发送
+            Send
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 设置模态框 -->
+    <!-- Settings modal -->
     <div
       id="settingsModal"
       class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50"
     >
       <div class="bg-white rounded-lg p-6 w-96">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-medium">设置</h3>
+          <h3 class="text-lg font-medium">Settings</h3>
           <button id="closeSettings" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times"></i>
           </button>
@@ -192,7 +200,7 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Ollama 服务器地址</label
+              >Ollama Server URL</label
             >
             <input
               type="text"
@@ -203,7 +211,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"
-              >模型名称</label
+              >Model Name</label
             >
             <input
               type="text"
@@ -214,12 +222,12 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"
-              >系统提示词</label
+              >System Prompt</label
             >
             <textarea
               id="systemPrompt"
               class="w-full border border-gray-300 rounded-md px-3 py-2 h-32 resize-none"
-              placeholder="请输入系统提示词..."
+              placeholder="Enter system prompt..."
             ></textarea>
           </div>
           <div class="flex gap-2">
@@ -227,13 +235,13 @@
               id="saveSettings"
               class="flex-1 bg-gray-900 text-white rounded-md px-4 py-2 hover:bg-gray-800 transition-colors"
             >
-              保存设置
+              Save Settings
             </button>
             <button
               id="checkOllama"
               class="flex-1 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700 transition-colors"
             >
-              检测连接
+              Test Connection
             </button>
           </div>
         </div>
@@ -241,7 +249,7 @@
     </div>
 
     <script>
-      // IndexedDB工具函数
+      // IndexedDB utility functions
       const DB_NAME = 'ai_chat_db'
       const DB_VERSION = 1
       const CHAT_STORE = 'chatDetails'
@@ -265,7 +273,7 @@
       }
 
       function saveChatDetail(chatId, messages) {
-        // 只保存可序列化字段
+        // Only save serializable fields
         const serializableMessages = messages.map((msg) => {
           const { content, isAI, chatId } = msg
           return { content, isAI, chatId }
@@ -305,7 +313,7 @@
         })
       }
 
-      // 会话列表存储到localStorage
+      // Store chat list to localStorage
       function saveChatListToLocalStorage(chatListArr) {
         localStorage.setItem('chatList', JSON.stringify(chatListArr))
       }
@@ -315,13 +323,13 @@
         return data ? JSON.parse(data) : []
       }
 
-      // 从localStorage加载设置
+      // Load settings from localStorage
       const ollamaUrlInput = document.getElementById('ollamaUrl')
       const modelNameInput = document.getElementById('modelName')
       const systemPromptInput = document.getElementById('systemPrompt')
       const settingsModal = document.getElementById('settingsModal')
 
-      // 加载保存的设置
+      // Load saved settings
       if (localStorage.getItem('ollamaUrl')) {
         ollamaUrlInput.value = localStorage.getItem('ollamaUrl')
       }
@@ -332,17 +340,17 @@
         systemPromptInput.value = localStorage.getItem('systemPrompt')
       }
 
-      // 设置按钮点击事件
+      // Setup button click events
       document.getElementById('settingsBtn').addEventListener('click', () => {
         settingsModal.classList.remove('hidden')
       })
 
-      // 关闭设置模态框
+      // Close settings modal
       document.getElementById('closeSettings').addEventListener('click', () => {
         settingsModal.classList.add('hidden')
       })
 
-      // 保存设置
+      // Save settings
       document.getElementById('saveSettings').addEventListener('click', () => {
         localStorage.setItem('ollamaUrl', ollamaUrlInput.value)
         localStorage.setItem('modelName', modelNameInput.value)
@@ -350,13 +358,45 @@
         settingsModal.classList.add('hidden')
       })
 
-      // 检测Ollama连接
+      // Clear all chats
+      document
+        .getElementById('clearAllBtn')
+        .addEventListener('click', async () => {
+          if (
+            confirm(
+              'Are you sure you want to delete all chats? This cannot be undone.'
+            )
+          ) {
+            // Clear IndexedDB
+            const db = await openDB()
+            const tx = db.transaction([CHAT_STORE], 'readwrite')
+            const store = tx.objectStore(CHAT_STORE)
+            await store.clear()
+
+            // Clear localStorage chat list
+            localStorage.removeItem('chatList')
+
+            // Clear memory
+            chatData.clear()
+            chatListArr = []
+
+            // Clear UI
+            chatList.innerHTML = ''
+            chatMessages.innerHTML = ''
+            currentChatId = null
+
+            // Create new default chat
+            createNewChat()
+          }
+        })
+
+      // Check Ollama connection
       document
         .getElementById('checkOllama')
         .addEventListener('click', async () => {
           const ollamaUrl = ollamaUrlInput.value.trim()
           if (!ollamaUrl) {
-            alert('请先输入Ollama服务器地址')
+            alert('Please input Ollama URL.')
             return
           }
 
@@ -371,17 +411,19 @@
 
             const result = await response.json()
             if (result.data.success) {
-              alert('Ollama服务连接成功！')
+              alert('Ollama service connected successfully!')
             } else {
-              alert(`连接失败: ${result.msg}`)
+              alert(`Connection failed: ${result.msg}`)
             }
           } catch (error) {
-            console.error('检测连接时出错:', error)
-            alert('检测连接时发生错误，请检查控制台')
+            console.error('Error testing connection:', error)
+            alert(
+              'Error occurred while testing connection, please check console'
+            )
           }
         })
 
-      // 全局聊天数据存储
+      // Global chat data storage
       const chatData = new Map()
       const responseControllers = new Map()
       let currentChatId = null
@@ -391,41 +433,58 @@
 
       let chatListArr = getChatListFromLocalStorage()
 
-      // 恢复会话列表和详情
+      // Restore chat list and details
       document.addEventListener('DOMContentLoaded', async () => {
-        // 按时间倒序排序
+        // Create default chat if no chats exist
+        if (chatListArr.length === 0) {
+          createNewChat()
+          return
+        }
+
+        // Sort by timestamp in ascending order
         chatListArr.sort((a, b) => a.createdAt - b.createdAt)
-        // 恢复会话列表
-        chatListArr.forEach((chatObj) => {
-          createChatItem(chatObj.id, chatObj.name, chatObj.rolePrompt)
-        })
-        // 恢复会话详情
+
+        // Restore chat details
         for (const chatObj of chatListArr) {
           const messages = await getChatDetail(chatObj.id)
           if (messages && messages.length) {
             chatData.set(chatObj.id, messages)
           }
         }
-        // 自动切换到第一个会话
-        if (chatListArr.length > 0) {
-          switchChat(chatListArr[0].id)
-        }
+        // Restore chat list
+        chatListArr.forEach((chatObj) => {
+          createChatItem(chatObj.id, chatObj.name, chatObj.rolePrompt)
+        })
+        // Automatically switch to first chat
+        switchChat(chatListArr.at(-1).id)
       })
 
-      // 创建新会话
+      // Create new chat
       function createNewChat() {
+        // Check if the last chat is empty, if so select it instead of creating a new one
+        if (chatListArr.length > 0) {
+          const lastChat = chatListArr.at(-1) // Sorted by timestamp in ascending order, first is newest
+          const messages = chatData.get(lastChat.id) || []
+          if (messages.length === 0) {
+            // If the last chat has no messages, select it directly
+            switchChat(lastChat.id)
+            // Focus on the input field
+            messageInput.focus()
+            return
+          }
+        }
+
         const chatId = uuidv4()
         const chatObj = {
           id: chatId,
-          name: `会话 ${chatListArr.length + 1}`,
-          rolePrompt: '', // 预留角色提示词
+          name: 'New Chat',
+          rolePrompt: '', // Reserved for role prompt
           createdAt: Date.now(),
         }
         chatListArr.unshift(chatObj)
-        // 按时间倒序排序
+        // Sort by timestamp in ascending order
         chatListArr.sort((a, b) => a.createdAt - b.createdAt)
         saveChatListToLocalStorage(chatListArr)
-        // 重新渲染会话列表
         chatList.innerHTML = ''
         chatListArr.forEach((chatObj) => {
           createChatItem(chatObj.id, chatObj.name, chatObj.rolePrompt)
@@ -437,20 +496,91 @@
         .getElementById('newChat')
         .addEventListener('click', createNewChat)
 
-      // 创建会话项
+      // Format chat name: take first 20 characters and filter out spaces and special characters
+      function formatChatName(message) {
+        if (!message) return 'New Chat'
+        // Filter out spaces and special characters
+        const filteredMessage = message
+          .replace(/[\s!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]+/g, '')
+          .trim()
+        // Take first 20 characters
+        return (
+          filteredMessage.slice(0, 20) +
+          (filteredMessage.length > 20 ? '...' : '')
+        )
+      }
+
+      // Create chat item
       function createChatItem(chatId, name, rolePrompt) {
         const chatItem = document.createElement('div')
-        chatItem.className =
-          'p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors'
-        chatItem.textContent = name || `会话 ${chatList.children.length + 1}`
         chatItem.dataset.chatId = chatId
+        chatItem.className =
+          'p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors relative group'
+        const nameSpan = document.createElement('span')
+
+        // If there are messages, use the first message as the name
+        const messages = chatData.get(chatId) || []
+        if (messages.length > 0 && !messages[0].isAI) {
+          console.log(
+            'messages, name',
+            messages[0].content,
+            formatChatName(messages[0].content)
+          )
+          nameSpan.textContent = formatChatName(messages[0].content)
+        } else {
+          nameSpan.textContent = name || 'New Chat'
+        }
+
         chatItem.onclick = () => switchChat(chatId)
+
+        const deleteBtn = document.createElement('button')
+        deleteBtn.className =
+          'absolute right-2 top-1/2 -translate-y-1/2 hidden group-hover:block text-gray-400 hover:text-red-500'
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>'
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation()
+          if (confirm('Are you sure you want to delete this chat?')) {
+            // Delete from IndexedDB
+            openDB().then((db) => {
+              const tx = db.transaction([CHAT_STORE], 'readwrite')
+              const store = tx.objectStore(CHAT_STORE)
+              store.delete(chatId)
+            })
+
+            // Delete from localStorage
+            const index = chatListArr.findIndex((chat) => chat.id === chatId)
+            if (index > -1) {
+              chatListArr.splice(index, 1)
+              saveChatListToLocalStorage(chatListArr)
+            }
+
+            // Delete from memory
+            chatData.delete(chatId)
+
+            // Remove from UI
+            chatItem.remove()
+
+            // If this was the current chat, clear the messages area
+            if (currentChatId === chatId) {
+              chatMessages.innerHTML = ''
+              currentChatId = null
+
+              // Switch to first available chat if exists
+              if (chatListArr.length > 0) {
+                switchChat(chatListArr[0].id)
+              }
+            }
+          }
+        }
+
+        chatItem.appendChild(nameSpan)
+        chatItem.appendChild(deleteBtn)
         chatList.insertBefore(chatItem, chatList.firstChild)
       }
 
-      // 切换会话
+      // Switch chat
       function switchChat(chatId) {
-        // 如果当前会话有正在进行的响应，将其保存到对应的会话中
+        // If current chat has pending response, save it to corresponding chat
         if (currentChatId) {
           const currentMessages = chatData.get(currentChatId) || []
           const lastMessage = currentMessages[currentMessages.length - 1]
@@ -460,13 +590,13 @@
         }
 
         currentChatId = chatId
-        // 清空消息区域
+        // Clear message area
         chatMessages.innerHTML = ''
-        // 显示当前会话的历史消息
+        // Show current chat's history messages
         const messages = chatData.get(chatId) || []
         messages.forEach((msg) => {
           if (msg.messageBubble && msg.isAI) {
-            // 如果存在消息气泡引用，直接使用它
+            // If message bubble reference exists, use it directly
             const container =
               msg.messageContainer || msg.messageBubble.parentElement
             container.style.display = ''
@@ -475,13 +605,13 @@
             addMessage(msg.content, msg.isAI)
           }
         })
-        // 高亮当前会话
+        // Highlight current chat
         Array.from(chatList.children).forEach((item) => {
           item.classList.toggle('bg-gray-100', item.dataset.chatId === chatId)
         })
       }
 
-      // 添加消息到聊天区域
+      // Add message to chat area
       function addMessage(content, isAI = false) {
         const messageDiv = document.createElement('div')
         messageDiv.className = `flex items-start gap-2 ${isAI ? 'justify-start' : 'justify-end'}`
@@ -492,7 +622,7 @@
         const messageBubble = document.createElement('div')
         messageBubble.className = `rounded-lg px-4 py-2 ${isAI ? 'bg-white border border-gray-200 prose' : 'bg-gray-900 text-white prose prose-invert'}`
 
-        // 优化：解析<think></think>标签，思考部分放details，正文部分用marked解析
+        // Optimization: Parse <think></think> tags, put thinking part in details, main content parsed by marked
         if (isAI && content.includes('<think>')) {
           const thinkStart = content.indexOf('<think>')
           const thinkEnd = content.indexOf('</think>')
@@ -501,10 +631,10 @@
             const beforeThink = content.slice(0, thinkStart)
             const thinkContent = content.slice(thinkStart + 7, thinkEnd)
             const afterThink = content.slice(thinkEnd + 8)
-            // details标签
+            // details element
             const details = document.createElement('details')
             const summary = document.createElement('summary')
-            summary.textContent = '深度思考中'
+            summary.textContent = 'Finished thinking'
             summary.className = 'cursor-pointer mb-2 text-gray-900'
             details.appendChild(summary)
             details.className = 'text-gray-500 text-sm mb-4 leading-relaxed'
@@ -526,10 +656,10 @@
           messageBubble.innerHTML = marked.parse(content)
         }
 
-        // 添加复制按钮
+        // Add copy button
         const copyBtn = document.createElement('i')
         copyBtn.className = `fas fa-copy cursor-pointer mt-2 text-gray-500 hover:text-gray-700 text-xl`
-        copyBtn.title = '复制消息'
+        copyBtn.title = 'Copy'
         copyBtn.onclick = () => {
           navigator.clipboard.writeText(
             content.replace(/<think>[\s\S]*?<\/think>/g, '').trim()
@@ -561,20 +691,34 @@
         return messageBubble
       }
 
-      // 发送消息函数
+      // Send message function
       async function sendMessage() {
         const message = messageInput.value.trim()
         if (message && currentChatId) {
           messageInput.value = ''
 
-          // 添加用户消息并保存到聊天数据
+          // Add user message and save to chat data
           addMessage(message, false)
           const messages = chatData.get(currentChatId) || []
           messages.push({ content: message, isAI: false })
           chatData.set(currentChatId, messages)
           await saveChatDetail(currentChatId, messages)
 
-          // 立即创建AI消息容器和显示Loading状态
+          // Update chat title for first message
+          if (messages.length === 1) {
+            const chatItem = Array.from(chatList.children).find(
+              (item) => item.dataset.chatId === currentChatId
+            )
+            if (chatItem) {
+              const formattedName = formatChatName(message)
+              const nameSpan = chatItem.querySelector('span')
+              if (nameSpan) {
+                nameSpan.textContent = formattedName
+              }
+            }
+          }
+
+          // Immediately create AI message container and show loading state
           const messageContainer = document.createElement('div')
           messageContainer.className = 'flex items-start gap-2 justify-start'
 
@@ -584,7 +728,7 @@
           const icon = document.createElement('i')
           icon.className = 'fas fa-robot text-gray-600'
 
-          // 创建loading图标
+          // Create loading icon
           const loadingIcon = document.createElement('i')
           loadingIcon.className = 'fas fa-spinner fa-spin text-gray-600'
           loadingIcon.id = `loading-${Date.now()}`
@@ -600,18 +744,18 @@
             content: '',
             isAI: true,
             messageContainer,
-            chatId: currentChatId, // 添加chatId标识
+            chatId: currentChatId, // Add chatId identifier
           }
           messages.push(messageData)
           chatData.set(currentChatId, messages)
 
-          // 获取Ollama配置
+          // Get Ollama configuration
           const ollamaUrl =
             localStorage.getItem('ollamaUrl') || 'http://localhost:11434'
           const modelName = localStorage.getItem('modelName') || 'llama2'
           const systemPrompt = localStorage.getItem('systemPrompt') || ''
 
-          // 调用Ollama API
+          // Call Ollama API
           try {
             const response = await fetch('/api/chat', {
               method: 'POST',
@@ -634,14 +778,14 @@
             const reader = response.body.getReader()
             const decoder = new TextDecoder()
             let aiMessage = ''
-            let isFirstResponse = true // 添加标记，用于判断是否是第一次响应
+            let isFirstResponse = true // Add flag to determine if it's first response
 
             let copyBtn
             while (true) {
               const { done, value } = await reader.read()
               if (done) break
 
-              // 解析响应数据
+              // Parse response data
               const text = decoder.decode(value)
 
               const lines = text.split('\n')
@@ -651,7 +795,7 @@
                   try {
                     const data = JSON.parse(line)
                     if (data.response) {
-                      // 如果是第一次收到响应，移除 loading 图标
+                      // If it's first response, remove loading icon
                       if (isFirstResponse) {
                         const loadingIcon =
                           iconContainer.querySelector('.fa-spinner')
@@ -668,29 +812,29 @@
                 }
               }
 
-              // 处理AI消息中的思考标签
+              // Process thinking tags in AI message
               let processedMessage = ''
               let thinkingContent = ''
               let details = null
 
-              // 更新AI消息显示
+              // Update AI message display
               const messages = chatData.get(messageData.chatId)
               const lastMessage = messages[messages.length - 1]
               if (lastMessage.chatId === messageData.chatId) {
                 lastMessage.content = aiMessage
               }
 
-              // 如果还没有创建消息气泡，创建一个
+              // If message bubble not created yet, create one
               if (!lastMessage.messageBubble) {
                 const messageBubble = document.createElement('div')
                 messageBubble.className =
                   'rounded-lg px-4 py-2 bg-white border border-gray-200'
 
                 lastMessage.messageBubble = messageBubble
-                // 添加复制按钮
+                // Add copy button
                 copyBtn = document.createElement('i')
                 copyBtn.className = `hidden fas fa-copy cursor-pointer mt-2 text-gray-500 hover:text-gray-700 text-xl`
-                copyBtn.title = '复制消息'
+                copyBtn.title = 'Copy'
                 copyBtn.onclick = () => {
                   navigator.clipboard.writeText(
                     lastMessage.content
@@ -716,29 +860,29 @@
                 lastMessage.messageContainer.appendChild(messageContentDiv)
               }
 
-              // 处理消息内容
+              // Process message content
               let thinkStartIndex = aiMessage.indexOf('<think>')
 
-              // 确保消息区域滚动到底部
+              // Ensure message area scrolls to bottom
               chatMessages.scrollTop = chatMessages.scrollHeight
 
               if (thinkStartIndex !== -1) {
-                // 添加think标签之前的内容
+                // Content before think tag
                 processedMessage = aiMessage.slice(0, thinkStartIndex)
 
-                // 跳过<think>标签
+                // Skip <think> tag
                 thinkStartIndex += 7
 
-                // 查找</think>标签
+                // Find </think> tag
                 let thinkEndIndex = aiMessage.indexOf(
                   '</think>',
                   thinkStartIndex
                 )
 
-                // 创建details元素
+                // Create details element
                 details = document.createElement('details')
                 const summary = document.createElement('summary')
-                summary.textContent = '深度思考中'
+                summary.textContent = 'Thinking...'
                 summary.className = 'cursor-pointer mb-2 text-gray-900'
                 details.appendChild(summary)
                 details.className = 'text-gray-500 text-sm mb-4 leading-relaxed'
@@ -746,7 +890,7 @@
                 lastMessage.messageBubble.appendChild(details)
 
                 if (thinkEndIndex !== -1) {
-                  // 提取思考内容
+                  // Extract thinking content
                   thinkingContent = aiMessage.slice(
                     thinkStartIndex,
                     thinkEndIndex
@@ -755,54 +899,54 @@
                   p.textContent = thinkingContent
                   details.appendChild(p)
 
-                  // 关闭details并更新状态
+                  // Close details and update status
                   details.removeAttribute('open')
-                  summary.textContent = '已完成思考'
+                  summary.textContent = 'Finished thinking'
 
-                  // 添加think标签后的内容
+                  // Content after think tag
                   const remainingContent = document.createElement('div')
                   remainingContent.className = 'prose'
                   remainingContent.innerHTML = marked.parse(
                     aiMessage.slice(thinkEndIndex + 8)
                   )
                   lastMessage.messageBubble.appendChild(remainingContent)
-                  // 确保消息区域滚动到底部
+                  // Ensure message area scrolls to bottom
                   chatMessages.scrollTop = chatMessages.scrollHeight
                 } else {
-                  // 如果没有结束标签，保持details打开状态
+                  // If no closing tag, keep details open
                   details.setAttribute('open', '')
                   const p = document.createElement('p')
                   p.textContent = aiMessage.slice(thinkStartIndex)
                   details.appendChild(p)
-                  // 确保消息区域滚动到底部
+                  // Ensure message area scrolls to bottom
                   chatMessages.scrollTop = chatMessages.scrollHeight
                 }
                 details = null
               } else {
-                // 如果没有think标签，直接显示完整消息
+                // If no think tag, show full message directly
                 lastMessage.messageBubble.innerHTML = marked.parse(aiMessage)
               }
 
-              // 更新最终消息内容
+              // Update final message content
               if (processedMessage && !lastMessage.messageBubble.innerHTML) {
                 lastMessage.messageBubble.innerHTML =
                   marked.parse(processedMessage)
               }
             }
 
-            // 去掉 messageContentDiv 的 hidden 类
+            // Remove hidden class from messageContentDiv
             if (copyBtn) {
               copyBtn.classList.remove('hidden')
             }
 
-            // 保存AI消息到indexDB
+            // Save AI message to indexDB
             await saveChatDetail(currentChatId, chatData.get(currentChatId))
           } catch (error) {
-            console.error('API调用失败:', error)
+            console.error('API calling failed:', error)
             const messages = chatData.get(currentChatId)
             const lastMessage = messages[messages.length - 1]
 
-            // 如果最后一条消息是空的AI响应，从chatData和DOM中删除它
+            // If last message is empty AI response, remove it from chatData and DOM
             if (lastMessage && lastMessage.isAI && !lastMessage.content) {
               messages.pop()
               if (messageContainer) {
@@ -810,9 +954,9 @@
               }
             }
 
-            // 添加错误消息
+            // Add error message
             const errorMessage = addMessage(
-              `抱歉，获取AI响应时出错: ${error.message}`,
+              `Sorry, error respond: ${error.message}`,
               true
             )
 
@@ -821,24 +965,29 @@
             }
           }
 
-          // 更新会话标题（仅在第一条消息时）
+          // Update chat title (only for first message)
           const chatItem = Array.from(chatList.children).find(
             (item) => item.dataset.chatId === currentChatId
           )
-          if (chatItem && chatMessages.children.length === 1) {
-            chatItem.textContent =
-              message.slice(0, 20) + (message.length > 20 ? '...' : '')
-            // 同步更新chatListArr和localStorage
+          if (chatItem && messages.length === 1) {
+            // Use formatted message as chat name
+            const formattedName = formatChatName(message)
+            // Update chat name in DOM
+            const nameSpan = chatItem.querySelector('span')
+            if (nameSpan) {
+              nameSpan.textContent = formattedName
+            }
+            // Synchronously update chatListArr and localStorage
             const chatObj = chatListArr.find((c) => c.id === currentChatId)
             if (chatObj) {
-              chatObj.name = chatItem.textContent
+              chatObj.name = formattedName
               saveChatListToLocalStorage(chatListArr)
             }
           }
         }
       }
 
-      // 处理按键发送
+      // Handle key press send
       messageInput.addEventListener('keypress', async (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault()
@@ -846,15 +995,10 @@
         }
       })
 
-      // 处理按钮发送
+      // Handle button send
       document
         .getElementById('sendButton')
         .addEventListener('click', () => sendMessage())
-
-      // 创建初始会话（如果没有历史会话）
-      if (chatListArr.length === 0) {
-        createNewChat()
-      }
     </script>
   </body>
 </html>

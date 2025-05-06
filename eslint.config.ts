@@ -53,7 +53,7 @@ export default tseslint.config(
         'error',
         { argsIgnorePattern: '^_' },
       ],
-      '@typescript-eslint/explicit-module-boundary-types': 'off', // 根据需要开启或关闭
+      '@typescript-eslint/explicit-module-boundary-types': 'off', // Enable or disable as needed
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
@@ -62,7 +62,7 @@ export default tseslint.config(
 
   // Vitest
   {
-    files: ['**/*.test.ts', '**/*.spec.ts', '**/tests/**/*.ts'], // 匹配测试文件
+    files: ['**/*.test.ts', '**/*.spec.ts', '**/tests/**/*.ts'], // Match test files
     plugins: {
       vitest,
     },

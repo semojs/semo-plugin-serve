@@ -54,49 +54,49 @@ export const handler = function (argv) {
 
   switch (argv.format) {
     case 'typescript':
-      code = `// export const name = '' // 路由名字，非必填
-// export const path = '' // 追加额外的路由，非必填
-// export const method = 'get' // 路由方法，默认 get，非必填
+      code = `// export const name = '' // Route name (optional)
+// export const path = '' // Additional route path (optional)
+// export const method = 'get' // HTTP method, defaults to get (optional)
 // // https://indicative.adonisjs.com/validations/master/min
-// export const middleware = [] // 为单个路由指定前置中间件
-// export const validate = {
-//   username: 'min:6'
-// }
+// export const middleware = [] // Middleware for this route
+// export const validate = z.object({
+//   username: z.string().min(6),
+// })
 export const handler = async ctx => {
-  // ctx.errors[11] = '错误'
-  ctx.json = true // 返回JSON数据结构
+  // ctx.errors[11] = 'Error message'
+  ctx.json = true // Return JSON structure
   return 'hello'
 }
 `
       break
     case 'cjs':
-      code = `// exports.name = '' // 路由名字，非必填
-// exports.path = '' // 追加额外的路由，非必填
-// exports.method = 'get' // 路由方法，默认 get，非必填
+      code = `// exports.name = '' // Route name (optional)
+// exports.path = '' // Additional route path (optional)
+// exports.method = 'get' // HTTP method, defaults to get (optional)
 // // https://indicative.adonisjs.com/validations/master/min
-// exports.middleware = [] // 为单个路由指定前置中间件
-// exports.validate = {
-//   username: 'min:6'
-// }
+// exports.middleware = [] // Middleware for this route
+// exports.validate = z.object({
+//   username: z.string().min(6),
+// })
 exports.handler = async ctx => {
-  // ctx.errors[11] = '错误'
-  ctx.json = true // 返回JSON数据结构
+  // ctx.errors[11] = 'Error message'
+  ctx.json = true // Return JSON structure
   return 'hello'
 }
     `
       break
     case 'esm':
-      code = `// export const name = '' // 路由名字，非必填
-// export const path = '' // 追加额外的路由，非必填
-// export const method = 'get' // 路由方法，默认 get，非必填
+      code = `// export const name = '' // Route name (optional)
+// export const path = '' // Additional route path (optional)
+// export const method = 'get' // HTTP method, defaults to get (optional)
 // // https://indicative.adonisjs.com/validations/master/min
-// export const middleware = [] // 为单个路由指定前置中间件
-// export const validate = {
-//   username: 'min:6'
-// }
+// export const middleware = [] // Middleware for this route
+// export const validate = z.object({
+//   username: z.string().min(6),
+// })
 export const handler = async ctx => {
-  // ctx.errors[11] = '错误'
-  ctx.json = true // 返回JSON数据结构
+  // ctx.errors[11] = 'Error message'
+  ctx.json = true // Return JSON structure
   return 'hello'
 }
 `

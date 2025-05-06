@@ -6,7 +6,7 @@ import { SemoServerOptions } from '../common/types.js'
 export default (opts: SemoServerOptions) => {
   return async (ctx, next) => {
     await next()
-    // 静态资源都只支持 HEAD 和 GET
+    // Static resources only support HEAD and GET methods
     if (ctx.method !== 'HEAD' && ctx.method !== 'GET') return
 
     const sendOptions = {

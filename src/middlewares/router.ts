@@ -24,7 +24,7 @@ const travelRouter = (
     let route = routes[name]
 
     let overrideMethod
-    // name 中支持解析 get, post, put, delete, patch基于.分割
+    // Support parsing get, post, put, delete, patch in name based on dot separation
     const nameSplits = name.split('.')
     if (nameSplits.length > 1) {
       if (
@@ -37,34 +37,34 @@ const travelRouter = (
       }
     }
 
-    // 支持特殊路由 index
+    // Support special route index
     let routePath =
       name === 'index'
         ? `${prefixPath ? prefixPath : '/'}`
         : `${prefixPath}/${name}`
 
-    // 支持简单路由
+    // Support simple routes
     if (_.isFunction(route)) {
       route = { handler: route } // simple route
     }
 
     if (route.handler && _.isFunction(route.handler)) {
-      // 允许路由定义路由方法
+      // Allow routes to define HTTP methods
       const method =
         overrideMethod ?? (route.method ? _.lowerCase(route.method) : 'get')
 
-      // 允许路由做额外修饰
+      // Allow routes to have additional modifiers
       if (route.path) {
         routePath = `${routePath}/${route.path}`
       }
 
-      // 路由中间件
+      // Route middleware
       const middlewares: any[] = route.middleware
         ? _.castArray(route.middleware)
         : []
       if (route.handler) {
         middlewares.unshift(async (ctx: Context) => {
-          // 内置路由实例
+          // Built-in route instance
           ctx.router = router
           const input =
             method === 'get'
@@ -76,7 +76,7 @@ const travelRouter = (
                   ctx.request.body
                 )
 
-          // 支持参数校验路由配置
+          // Support parameter validation route configuration
           if (route.validate) {
             if (route.validate instanceof ZodType) {
               try {
@@ -107,7 +107,7 @@ const travelRouter = (
             code: 0,
           }
 
-          // 支持让路由控制关闭 gzip
+          // Support letting routes control gzip disabling
           if (opts.gzip) {
             ctx.gzip = true
           }
@@ -142,12 +142,12 @@ const travelRouter = (
 }
 
 export const routerMiddleware = async (opts: SemoServerOptions) => {
-  // 支持路由前缀
+  // Support route prefix
   if (opts.apiPrefix) {
     router.prefix(opts.apiPrefix)
   }
 
-  // Proxy 路由配置，支持跨域请求转发
+  // Proxy route configuration, supports cross-origin request forwarding
   if (opts.proxy) {
     router.get('/proxy/(.*)', async (ctx, _next) => {
       const proxyUrl = ctx.request.url.substring(7)
@@ -216,18 +216,19 @@ fill="#000000" stroke="none">
 `
   })
 
-  // 允许自定义路由
+  // Allow custom routes
   if (opts.addRoutes && typeof opts.addRoutes === 'function') {
     opts.addRoutes(router)
   }
-
-  const routes = opts.routeDir ? await importDirectory(opts.routeDir) : null
+  const routes = opts.routeDir
+    ? await importDirectory(path.resolve(opts.rootDir, opts.routeDir))
+    : null
 
   if (routes) {
     travelRouter(opts, router, routes)
   }
 
-  // 查看注册的所有路由
+  // View all registered routes
   if (opts.listRoutes) {
     if (!opts.disableInternalMiddlewareCustomStatic) {
       const publicDir = opts.publicDir

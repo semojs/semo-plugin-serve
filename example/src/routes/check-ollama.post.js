@@ -20,10 +20,10 @@ export const handler = async (ctx) => {
 
     return {
       success: true,
-      message: 'Ollama服务连接成功',
+      message: 'Ollama service connected successfully',
     }
   } catch (error) {
-    console.error('Ollama连接检查错误:', error)
+    console.error('Ollama connection check error:', error)
     ctx.error(ERROR_INTERNAL, error.message, 500)
   }
 }

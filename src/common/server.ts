@@ -6,10 +6,9 @@ import detect from 'detect-port'
 import isRoot from 'is-root'
 import Koa from 'koa'
 import _ from 'lodash'
-import { promises as fs } from 'node:fs'
-import open from 'open'
 import os from 'node:os'
 import path from 'node:path'
+import open from 'open'
 
 import { errorMiddleware } from '../middlewares/error.js'
 import { routerMiddleware } from '../middlewares/router.js'
@@ -27,12 +26,11 @@ import { SemoServerOptions } from './types.js'
 export const startServer = async (opts: SemoServerOptions, app: any = null) => {
   opts.rootDir ??= process.cwd()
   opts.publicDir ??= '.'
-  opts.routeDir ??= '.'
+  opts.routeDir ??= ''
   opts.apiPrefix ??= ''
   opts.port ??= 3000
 
   opts.publicDir = path.resolve(opts.rootDir, opts.publicDir)
-  opts.routeDir = path.resolve(opts.rootDir, opts.routeDir)
   if (opts.file404) {
     opts.file404 = path.resolve(opts.rootDir, opts.file404)
   }
@@ -54,7 +52,7 @@ export const startServer = async (opts: SemoServerOptions, app: any = null) => {
     app.use(bodyParser())
   }
 
-  // 错误处理
+  // Error handling
   if (!opts.disableInternalMiddlewareCustomError) {
     app.use(errorMiddleware)
   }
@@ -63,7 +61,7 @@ export const startServer = async (opts: SemoServerOptions, app: any = null) => {
     opts.initApp(app)
   }
 
-  // 加载常用中间件
+  // Load common middlewares
   if (!opts.disableInternalMiddlewareKoaLogger) {
     app.use(logger())
   }
@@ -71,7 +69,7 @@ export const startServer = async (opts: SemoServerOptions, app: any = null) => {
     app.use(cors({ credentials: true }))
   }
 
-  // 支持 Gzip
+  // Support Gzip
   if (opts.gzip) {
     app.use(
       compress({
@@ -96,37 +94,31 @@ export const startServer = async (opts: SemoServerOptions, app: any = null) => {
     )
   }
 
-  // 最后进行异常处理
+  // Final exception handling
   if (!opts.disableGlobalExcpetionRouter) {
     app.use(notFoundMiddleware)
   }
 
-  // 加载静态路由
+  // Load static routes
   if (!opts.disableInternalMiddlewareCustomStatic) {
-    await fs.access(opts.publicDir, fs.constants.F_OK)
-
     if (!opts.spa) {
       app.use(fileBrowser(opts))
     } else {
       app.use(staticMiddleware(opts))
     }
-
-    await fs.access(
-      path.resolve(opts.publicDir, opts.file404),
-      fs.constants.F_OK
-    )
   }
 
-  // 加载动态路由
-  // 如果fileIndex不存在，这里的路由有可能会跟serveIndex的机制冲突，所以如果明确只将本功能用于开发api服务，应该禁用index directory
+  // Load dynamic routes
+  // If fileIndex doesn't exist, routes here might conflict with serveIndex mechanism
+  // So if this feature is specifically for API development, index directory should be disabled
   if (!opts.disableInternalMiddlewareCustomRoutes) {
     app.use(await routerMiddleware(opts))
   }
 
-  // 给启动信息加个框
+  // Add a box for startup information
   const box = [colorize('green', 'Semo Serving!'), '']
 
-  // 端口检测
+  // Port detection
   const message =
     process.platform !== 'win32' && port < 1024 && !isRoot()
       ? `Admin permissions are required to run a server on a port below 1024.`
@@ -154,7 +146,7 @@ export const startServer = async (opts: SemoServerOptions, app: any = null) => {
     }
   }
 
-  // HOST地址检测
+  // HOST address detection
   const localhost = `http://localhost:${_port}`
   const network: any = _.chain(os.networkInterfaces())
     .flatMap()
@@ -167,7 +159,7 @@ export const startServer = async (opts: SemoServerOptions, app: any = null) => {
     await open(nethost || localhost)
   }
 
-  // 清除终端，copy from package: react-dev-utils
+  // Clear console, copied from package: react-dev-utils
   if (opts.clearConsole) {
     function clearConsole() {
       process.stdout.write(
