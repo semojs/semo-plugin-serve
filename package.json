@@ -1,6 +1,6 @@
 {
   "name": "semo-plugin-serve",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A Semo plugin to provide http server for static assets and basic api.",
   "main": "lib/index.js",
   "type": "module",
