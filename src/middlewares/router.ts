@@ -28,7 +28,7 @@ const travelRouter = (
     const nameSplits = name.split('.')
     if (nameSplits.length > 1) {
       if (
-        ['get', 'post', 'put', 'delete', 'patch'].includes(
+        ['get', 'post', 'put', 'patch', 'head', 'delete', 'options'].includes(
           nameSplits.at(-1).toLowerCase()
         )
       ) {
